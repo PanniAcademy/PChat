@@ -1,51 +1,96 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://aframe.io/releases/1.4.0/aframe-ar.min.js"></script>
-  </head>
-  <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs>
-      <a-assets>
-        <a-asset-item id="panniAvatar" src="https://models.readyplayer.me/67a392085508ce28db20eadc.glb"></a-asset-item>
-      </a-assets>
-      <a-entity position="0 0 -2">
-        <a-gltf-model src="#panniAvatar" scale="1 1 1"></a-gltf-model>
-      </a-entity>
-      <a-marker-camera preset='hiro'></a-marker-camera>
-    </a-scene>
-<script src="https://cdn.botpress.cloud/webchat/v1/inject.js"></script>
-<script>
-  window.botpressWebChat.init({
-    "botId": "e9111e86-c355-4b2d-ae20-cad8de539072",
-    "host": "https://cdn.botpress.cloud/webchat",
-    "showCloseButton": false,
-    "showMinimized": true,
-    "containerWidth": "100%",
-    "containerHeight": "400px"
-  });
-</script>
-<script>
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.lang = 'en-US';
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bubble</title>
+    <style>
+        /* Chat bubble styling */
+        #chat-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #0078FF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
 
-  recognition.onresult = function(event) {
-    var transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-    console.log("User said:", transcript);
+        #chat-bubble:hover {
+            transform: scale(1.1);
+        }
 
-    if (transcript.includes("hey panni")) {  
-      window.botpressWebChat.sendPayload({ type: 'text', text: 'Hello Panni AI' });
-    }
-  };
+        #chat-bubble img {
+            width: 35px;
+            height: 35px;
+        }
 
-  function startListening() {
-    recognition.start();
-  }
-</script>
+        /* Chat window */
+        #chat-container {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-<button onclick="startListening()" style="position: fixed; bottom: 10px; right: 10px;">🎤 Start Voice</button>
+        #chat-header {
+            background-color: #0078FF;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+        }
 
-  </body>
+        #close-chat {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        #chat-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chat Bubble -->
+    <div id="chat-bubble" onclick="toggleChat()">
+        <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" alt="Chat Icon">
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chat-container">
+        <div id="chat-header">
+            Panni AI
+            <span id="close-chat" onclick="toggleChat()">✖</span>
+        </div>
+        <iframe id="chat-frame" src="https://cdn.botpress.cloud/webchat/v1/index.html?botId=YOUR_BOTPRESS_BOT_ID"></iframe>
+    </div>
+
+    <script>
+        function toggleChat() {
+            var chatContainer = document.getElementById("chat-container");
+            chatContainer.style.display = (chatContainer.style.display === "flex") ? "none" : "flex";
+        }
+    </script>
+
+</body>
 </html>
