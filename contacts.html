@@ -7,21 +7,16 @@
 
         let userEmail = null;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            // Check if user is logged in
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    userEmail = user.email;
-                    alert("✅ Logged in as: " + userEmail);
-                    loadContacts();
-                } else {
-                    alert("⚠ Please log in first.");
-                    window.location.href = "login.html";
-                }
-            });
-
-            // Attach event listener
-            document.getElementById("addContactBtn").addEventListener("click", addContact);
+        // Wait for Firebase Auth to be ready
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userEmail = user.email;
+                alert("✅ Logged in as: " + userEmail);
+                loadContacts();
+            } else {
+                alert("⚠ Please log in first.");
+                window.location.href = "login.html";
+            }
         });
 
         async function addContact() {
@@ -33,7 +28,7 @@
             }
 
             try {
-                // Check if contact already exists
+                // Check if the contact already exists
                 const contactQuery = query(collection(db, "contacts"), where("owner", "==", userEmail), where("contact", "==", contactEmail));
                 const querySnapshot = await getDocs(contactQuery);
 
@@ -49,9 +44,10 @@
                 });
 
                 alert("✅ Contact added successfully!");
-                document.getElementById("contactEmail").value = "";
+                document.getElementById("contactEmail").value = ""; // Clear input field
             } catch (error) {
-                alert("❌ Error adding contact: " + error.message);
+                console.error("❌ Error adding contact:", error);
+                alert("❌ Error: " + error.message);
             }
         }
 
@@ -74,10 +70,10 @@
                     li.innerHTML = `<a href="chat.html?email=${contactEmail}">${contactEmail}</a>`;
                     list.appendChild(li);
                 });
-
-                alert("✅ Contacts loaded successfully.");
             });
         }
+
+        window.addContact = addContact;
     </script>
 
     <link rel="stylesheet" href="contacts.css">
@@ -85,7 +81,7 @@
 <body>
     <h2>PChat - Contacts</h2>
     <input type="text" id="contactEmail" placeholder="Enter Contact's Email">
-    <button id="addContactBtn">Add Contact</button>
+    <button onclick="addContact()">Add Contact</button>
     <ul id="contactList"></ul>
 </body>
 </html>
