@@ -3,13 +3,13 @@
 <head>
     <title>PChat - Contacts</title>
     <script type="module" src="./firebase-config.js"></script>
+
     <script type="module">
         import { auth, db } from "./firebase-config.js";
-        import { collection, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+        import { collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
-        let userEmail;
+        let userEmail = null;
 
-        // Wait for Firebase auth to be ready
         auth.onAuthStateChanged(user => {
             if (user) {
                 userEmail = user.email; // Get logged-in user's email
@@ -28,6 +28,15 @@
                 return;
             }
 
+            // Check if contact already exists
+            const contactQuery = query(collection(db, "contacts"), where("owner", "==", userEmail), where("contact", "==", contactEmail));
+            const querySnapshot = await getDocs(contactQuery);
+
+            if (!querySnapshot.empty) {
+                alert("Contact already exists!");
+                return;
+            }
+
             try {
                 await addDoc(collection(db, "contacts"), {
                     owner: userEmail,
@@ -42,6 +51,8 @@
         }
 
         function loadContacts() {
+            if (!userEmail) return;
+
             const q = query(collection(db, "contacts"), where("owner", "==", userEmail));
 
             onSnapshot(q, (snapshot) => {
@@ -59,7 +70,7 @@
 
         window.addContact = addContact;
     </script>
-    
+
     <link rel="stylesheet" href="contacts.css">
 </head>
 <body>
