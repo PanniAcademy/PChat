@@ -7,12 +7,13 @@
     <script src="firebase-config.js"></script>
 </head>
 <body>
+    <div id="loginContainer">
     <h2>Login with Phone Number</h2>
     <input type="text" id="phone" placeholder="Enter phone number">
     <button onclick="sendOTP()">Send OTP</button>
     <input type="text" id="otp" placeholder="Enter OTP">
     <button onclick="verifyOTP()">Verify</button>
-    
+    </div>
     <script>
         let confirmationResult;
         function sendOTP() {
