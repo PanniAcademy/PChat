@@ -7,15 +7,21 @@
 
         let userEmail = null;
 
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                userEmail = user.email;
-                alert("✅ Logged in as: " + userEmail);
-                loadContacts();
-            } else {
-                alert("⚠ Please log in first.");
-                window.location.href = "login.html";
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            // Check if user is logged in
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    userEmail = user.email;
+                    alert("✅ Logged in as: " + userEmail);
+                    loadContacts();
+                } else {
+                    alert("⚠ Please log in first.");
+                    window.location.href = "login.html";
+                }
+            });
+
+            // Attach event listener
+            document.getElementById("addContactBtn").addEventListener("click", addContact);
         });
 
         async function addContact() {
@@ -72,11 +78,6 @@
                 alert("✅ Contacts loaded successfully.");
             });
         }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("addContactBtn").addEventListener("click", addContact);
-        });
-
     </script>
 
     <link rel="stylesheet" href="contacts.css">
