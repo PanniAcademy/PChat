@@ -2,26 +2,16 @@
 <html lang="en">
 <head>
     <title>PChat - Contacts</title>
-    <script type="module" src="./firebase-config.js"></script>
-
     <script type="module">
-        import { auth, db } from "./firebase-config.js";
-        import { collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+        import { auth, db, onAuthStateChanged, collection, addDoc, query, where, onSnapshot, getDocs } from "./firebase-config.js";
 
         let userEmail = null;
 
-        // Wait for Firebase Auth to be ready
-        auth.onAuthStateChanged(user => {
+        onAuthStateChanged(auth, user => {
             if (user) {
                 userEmail = user.email;
-                alert("✅ Logged in as:", userEmail);
+                alert("✅ Logged in as: " + userEmail);
                 loadContacts();
-
-                // Move the event listener here:
-                document.addEventListener("DOMContentLoaded", function () {
-                    document.getElementById("addContactBtn").addEventListener("click", addContact);
-                });
-
             } else {
                 alert("⚠ Please log in first.");
                 window.location.href = "login.html";
@@ -37,7 +27,7 @@
             }
 
             try {
-                // Check if the contact already exists
+                // Check if contact already exists
                 const contactQuery = query(collection(db, "contacts"), where("owner", "==", userEmail), where("contact", "==", contactEmail));
                 const querySnapshot = await getDocs(contactQuery);
 
@@ -53,20 +43,14 @@
                 });
 
                 alert("✅ Contact added successfully!");
-                document.getElementById("contactEmail").value = ""; // Clear input field
+                document.getElementById("contactEmail").value = "";
             } catch (error) {
-                console.error("❌ Error adding contact:", error);
-                alert("Error: " + error.message);
+                alert("❌ Error adding contact: " + error.message);
             }
         }
 
         function loadContacts() {
-            if (!userEmail) {
-                alert("⚠ User email not available yet.");
-                return;
-            }
-
-            alert("📂 Loading contacts...");
+            if (!userEmail) return;
 
             const q = query(collection(db, "contacts"), where("owner", "==", userEmail));
 
@@ -88,6 +72,10 @@
                 alert("✅ Contacts loaded successfully.");
             });
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("addContactBtn").addEventListener("click", addContact);
+        });
 
     </script>
 
