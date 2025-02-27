@@ -18,7 +18,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
+window.auth = auth;
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.signOut = signOut;
+window.db = db;
 
 
 
