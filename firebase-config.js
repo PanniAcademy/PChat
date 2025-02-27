@@ -1,4 +1,5 @@
-// Import Firebase modules
+
+// Import Firebase modules (ES Modules)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
@@ -21,5 +22,5 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// Export Firebase modules so other scripts can use them
+// Export Firebase modules
 export { auth, db, RecaptchaVerifier, signInWithPhoneNumber };
