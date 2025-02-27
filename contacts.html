@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Contacts</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <h2>Contacts</h2>
+    <input type="text" id="contactPhone" placeholder="Enter Contact's Phone">
+    <button onclick="addContact()">Add Contact</button>
+    <ul id="contactList"></ul>
+
+    <script>
+        const userPhone = auth.currentUser?.phoneNumber; 
+
+        function addContact() {
+            let contactPhone = document.getElementById("contactPhone").value;
+            db.collection("contacts").add({ owner: userPhone, contact: contactPhone });
+        }
+
+        db.collection("contacts").where("owner", "==", userPhone).onSnapshot(snapshot => {
+            let list = document.getElementById("contactList");
+            list.innerHTML = "";
+            snapshot.forEach(doc => {
+                let li = document.createElement("li");
+                li.innerHTML = `<a href="chat.html?phone=${doc.data().contact}">${doc.data().contact}</a>`;
+                list.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
