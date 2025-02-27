@@ -3,7 +3,8 @@
 <head>
     <title>PChat - Chat</title>
     <script type="module">
-        import { auth, db, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "./firebase-config.js";
+        import { auth, db } from "./firebase-config.js";
+        import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 
         const params = new URLSearchParams(window.location.search);
         const recipientEmail = params.get("email");
@@ -13,7 +14,7 @@
             auth.onAuthStateChanged(user => {
                 if (user) {
                     userEmail = user.email;
-                    alert("✅ Logged in as: " + userEmail);
+                    document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
                     loadMessages();
                 } else {
                     alert("⚠ Please log in first.");
@@ -21,7 +22,6 @@
                 }
             });
 
-            // Attach event listener to button
             document.getElementById("sendMessageBtn").addEventListener("click", sendMessage);
         });
 
@@ -58,9 +58,11 @@
                 chatBox.innerHTML = "";
 
                 snapshot.forEach(doc => {
-                    let msg = document.createElement("p");
                     let data = doc.data();
-                    msg.innerHTML = `<strong>${data.sender === userEmail ? "You" : data.sender}:</strong> ${data.text}`;
+                    let msg = document.createElement("div");
+                    msg.classList.add("message");
+                    msg.classList.add(data.sender === userEmail ? "sent" : "received");
+                    msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
                     chatBox.appendChild(msg);
                 });
 
@@ -72,9 +74,13 @@
     <link rel="stylesheet" href="chat.css">
 </head>
 <body>
-    <h2>PChat - Chat</h2>
-    <div id="chatBox" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
-    <input type="text" id="message" placeholder="Type a message">
-    <button id="sendMessageBtn">Send</button>
+    <div id="chatContainer">
+        <h2 id="chatHeader">PChat - Chat</h2>
+        <div id="chatBox"></div>
+        <div id="messageInput">
+            <input type="text" id="message" placeholder="Type a message">
+            <button id="sendMessageBtn">Send</button>
+        </div>
+    </div>
 </body>
 </html>
