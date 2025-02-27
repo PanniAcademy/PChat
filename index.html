@@ -3,94 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Bubble</title>
-    <style>
-        /* Chat bubble styling */
-        #chat-bubble {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #0078FF;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        #chat-bubble:hover {
-            transform: scale(1.1);
-        }
-
-        #chat-bubble img {
-            width: 35px;
-            height: 35px;
-        }
-
-        /* Chat window */
-        #chat-container {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 350px;
-            height: 450px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #chat-header {
-            background-color: #0078FF;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        #close-chat {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        #chat-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+    <title>My Chat App</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- Chat Bubble -->
-    <div id="chat-bubble" onclick="toggleChat()">
-        <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" alt="Chat Icon">
-    </div>
-
-    <!-- Chat Window -->
-    <div id="chat-container">
-        <div id="chat-header">
-            Panni AI
-            <span id="close-chat" onclick="toggleChat()">✖</span>
-        </div>
-        <iframe id="chat-frame" src="https://cdn.botpress.cloud/webchat/v1/index.html?botId=e9111e86-c355-4b2d-ae20-cad8de539072"></iframe>
-    </div>
-
-    <script>
-        function toggleChat() {
-            var chatContainer = document.getElementById("chat-container");
-            chatContainer.style.display = (chatContainer.style.display === "flex") ? "none" : "flex";
-        }
-    </script>
-
+    <h1>Welcome to My Chat App</h1>
+    <p>Chat securely with anyone using their phone number.</p>
+    <button onclick="window.location.href='login.html'">Try it for Free</button>
 </body>
 </html>
