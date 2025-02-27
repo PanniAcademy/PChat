@@ -14,7 +14,7 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 userEmail = user.email;
-                console.log("Logged in as:", userEmail);
+                alert("Logged in as:", userEmail);
                 loadContacts();
             } else {
                 alert("Please log in first.");
