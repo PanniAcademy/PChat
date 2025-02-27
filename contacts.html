@@ -16,6 +16,12 @@
                 userEmail = user.email;
                 alert("✅ Logged in as:", userEmail);
                 loadContacts();
+
+                // Move the event listener here:
+                document.addEventListener("DOMContentLoaded", function () {
+                    document.getElementById("addContactBtn").addEventListener("click", addContact);
+                });
+
             } else {
                 alert("⚠ Please log in first.");
                 window.location.href = "login.html";
@@ -82,11 +88,6 @@
                 alert("✅ Contacts loaded successfully.");
             });
         }
-
-        // Make sure the button is connected to the function
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("addContactBtn").addEventListener("click", addContact);
-        });
 
     </script>
 
