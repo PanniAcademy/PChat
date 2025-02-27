@@ -1,6 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-analytics.js";
 
 const firebaseConfig = {
@@ -18,5 +23,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// Export for other scripts
-export { auth, db, onAuthStateChanged, collection, addDoc, query, where, onSnapshot, getDocs, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
+// Export to global scope
+window.auth = auth;
+window.db = db;
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.signOut = signOut;
