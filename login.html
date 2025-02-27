@@ -4,7 +4,7 @@
     <title>Login - PChat</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="firebase-config.js"></script>
+    <script src="firebase-config.js"></script> <!-- Make sure this file correctly initializes Firebase -->
     <link rel="stylesheet" href="login.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -20,27 +20,35 @@
     </div>
 
     <script>
+        let auth;
         let confirmationResult;
 
-        // Initialize Firebase Authentication
-        const auth = firebase.auth();
+        // Ensure Firebase initializes first
+        document.addEventListener("DOMContentLoaded", function () {
+            // Wait until Firebase is fully loaded before using auth
+            firebase.auth().onAuthStateChanged(user => {
+                auth = firebase.auth(); // Now it's initialized
 
-        // Initialize Recaptcha
-        window.onload = function () {
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
-                size: "normal",
-                callback: function(response) {
-                    console.log("Recaptcha solved!", response);
-                },
-                "expired-callback": function() {
-                    console.log("Recaptcha expired. Please solve it again.");
-                }
+                // Initialize Recaptcha once Firebase is ready
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+                    size: "normal",
+                    callback: function(response) {
+                        console.log("Recaptcha solved!", response);
+                    },
+                    "expired-callback": function() {
+                        console.log("Recaptcha expired. Please solve it again.");
+                    }
+                });
+                recaptchaVerifier.render();
             });
-            recaptchaVerifier.render();
-        };
+        });
 
         async function sendOTP() {
             try {
+                if (!auth) {
+                    alert("Firebase is not ready yet. Please try again.");
+                    return;
+                }
                 let phone = document.getElementById("phone").value;
                 if (!phone) {
                     alert("Please enter a valid phone number.");
@@ -57,6 +65,10 @@
 
         async function verifyOTP() {
             try {
+                if (!confirmationResult) {
+                    alert("You need to request an OTP first.");
+                    return;
+                }
                 let otp = document.getElementById("otp").value;
                 if (!otp) {
                     alert("Please enter the OTP.");
