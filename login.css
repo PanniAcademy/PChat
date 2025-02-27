@@ -1,0 +1,40 @@
+/* Login Page Styles */
+#loginContainer {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0px 0px 10px #00ffcc;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #00ffcc;
+    background-color: #222;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+#sendOTP, #verifyOTP {
+    width: 100%;
+    background-color: #00ffcc;
+    color: black;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#sendOTP:hover, #verifyOTP:hover {
+    background-color: #009977;
+}
