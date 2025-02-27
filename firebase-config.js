@@ -29,4 +29,3 @@ window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
 window.signInWithEmailAndPassword = signInWithEmailAndPassword;
 window.signOut = signOut;
 
-export { auth, db, onAuthStateChanged, collection, addDoc, query, where, onSnapshot, getDocs, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
