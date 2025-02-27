@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <title>PChat - Login</title>
-    <script type="module" src="./firebase-config.js"></script>
+    <script type="module">
+        import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "./firebase-config.js";
 
-    <script>
         async function registerUser() {
             let email = document.getElementById("email").value.trim();
             let password = document.getElementById("password").value.trim();
@@ -46,6 +46,10 @@
             alert("✅ Logged out successfully!");
             window.location.href = "login.html"; 
         }
+
+        // Expose functions globally for button clicks
+        window.registerUser = registerUser;
+        window.loginUser = loginUser;
     </script>
 
     <link rel="stylesheet" href="login.css">
