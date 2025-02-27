@@ -1,11 +1,8 @@
-
-// Import Firebase modules (ES Modules)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-analytics.js";
 
-// Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
     authDomain: "pchat-cd031.firebaseapp.com",
@@ -16,11 +13,12 @@ const firebaseConfig = {
     measurementId: "G-HJSX8FGMTB"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
-// Export Firebase modules
-export { auth, db, RecaptchaVerifier, signInWithPhoneNumber };
+export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
+
+
+
