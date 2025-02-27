@@ -10,16 +10,16 @@
             let password = document.getElementById("password").value.trim();
 
             if (!email || !password) {
-                alert("Please enter both email and password.");
+                alert("⚠ Please enter both email and password.");
                 return;
             }
 
             try {
-                await window.createUserWithEmailAndPassword(window.auth, email, password);
-                alert("Account created successfully!");
-                window.location.href = "contacts.html"; // Redirect to contacts page
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert("✅ Account created successfully!");
+                window.location.href = "contacts.html"; 
             } catch (error) {
-                alert("Error: " + error.message);
+                alert("❌ Error: " + error.message);
             }
         }
 
@@ -28,23 +28,23 @@
             let password = document.getElementById("password").value.trim();
 
             if (!email || !password) {
-                alert("Please enter both email and password.");
+                alert("⚠ Please enter both email and password.");
                 return;
             }
 
             try {
-                await window.signInWithEmailAndPassword(window.auth, email, password);
-                alert("Login successful!");
-                window.location.href = "contacts.html"; // Redirect to contacts page
+                await signInWithEmailAndPassword(auth, email, password);
+                alert("✅ Login successful!");
+                window.location.href = "contacts.html"; 
             } catch (error) {
-                alert("Error: " + error.message);
+                alert("❌ Error: " + error.message);
             }
         }
 
         async function logoutUser() {
-            await window.signOut(window.auth);
-            alert("Logged out successfully!");
-            window.location.href = "login.html"; // Redirect to login page
+            await signOut(auth);
+            alert("✅ Logged out successfully!");
+            window.location.href = "login.html"; 
         }
     </script>
 
@@ -53,7 +53,7 @@
 </head>
 <body>
     <div id="loginContainer">
-        <h2>Login to PChat</h2>
+        <h2>PChat - Login</h2>
         <input type="email" id="email" placeholder="Enter email">
         <input type="password" id="password" placeholder="Enter password">
         <button onclick="loginUser()">Login</button>
