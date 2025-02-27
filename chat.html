@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Chat</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <h2>Chat</h2>
+    <div id="chatBox"></div>
+    <input type="text" id="message" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const recipient = params.get("phone");
+        const userPhone = auth.currentUser?.phoneNumber;
+
+        function sendMessage() {
+            let msg = document.getElementById("message").value;
+            db.collection("messages").add({
+                sender: userPhone,
+                recipient: recipient,
+                text: msg,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        db.collection("messages")
+          .where("sender", "in", [userPhone, recipient])
+          .orderBy("timestamp")
+          .onSnapshot(snapshot => {
+              document.getElementById("chatBox").innerHTML = "";
+              snapshot.forEach(doc => {
+                  let msg = document.createElement("p");
+                  msg.innerText = doc.data().sender + ": " + doc.data().text;
+                  document.getElementById("chatBox").appendChild(msg);
+              });
+          });
+    </script>
+</body>
+</html>
