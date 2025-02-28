@@ -41,7 +41,7 @@
                     timestamp: serverTimestamp()
                 });
 
-                console.log("✅ Message sent:", msg);
+                alert("✅ Message sent:", msg);
                 document.getElementById("message").value = ""; // Clear input
             } catch (error) {
                 console.error("❌ Error sending message:", error);
@@ -66,14 +66,14 @@
                 chatBox.innerHTML = "";
 
                 if (snapshot.empty) {
-                    console.log("⚠ No messages found.");
+                    alert("⚠ No messages found.");
                 } else {
-                    console.log("📩 Messages received:", snapshot.size);
+                    alert("📩 Messages received:", snapshot.size);
                 }
 
                 snapshot.forEach(doc => {
                     let data = doc.data();
-                    console.log("💬 Message Data:", data);
+                    alert("💬 Message Data:", data);
 
                     let msg = document.createElement("div");
                     msg.classList.add("message");
