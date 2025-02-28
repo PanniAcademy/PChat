@@ -43,7 +43,7 @@
             if (!msg) return;
 
             try {
-                console.log("📩 Sending message:", msg);
+                alert("📩 Sending message:", msg);
 
                 await addDoc(collection(db, "messages"), {
                     sender: userEmail,
@@ -53,7 +53,7 @@
                 });
 
                 document.getElementById("message").value = ""; // Clear input
-                console.log("✅ Message sent!");
+                alert("✅ Message sent!");
             } catch (error) {
                 console.error("❌ Error sending message:", error);
                 alert("❌ Error: " + error.message);
@@ -62,11 +62,11 @@
 
         function loadMessages() {
             if (!userEmail || !recipientEmail) {
-                console.log("⚠ User email or recipient missing.");
+               alert("⚠ ERROR: userEmail or recipientEmail is missing.");
                 return;
             }
 
-            console.log("🔄 Loading messages between", userEmail, "and", recipientEmail);
+            alert(`🔄 Fetching messages between ${userEmail} and ${recipientEmail}`);
 
             const messagesRef = collection(db, "messages");
 
@@ -81,17 +81,17 @@
             chatBox.innerHTML = "<p>Loading messages...</p>";
 
             onSnapshot(q, (snapshot) => {
-                console.log("📡 Messages updated in real-time!");
+                alert("📡 Firestore snapshot triggered!");
 
                 chatBox.innerHTML = ""; // Clear previous messages
 
                 if (snapshot.empty) {
                     chatBox.innerHTML = "<p>No messages yet. Say hello! 👋</p>";
-                    console.log("ℹ No messages found.");
+                    alert("ℹ No messages found.");
                 } else {
                     snapshot.forEach(doc => {
                         let data = doc.data();
-                        console.log("📨 Message received:", data);
+                        alert("📨 Message received from Firestore:", data);
 
                         let msg = document.createElement("div");
                         msg.classList.add("message");
@@ -103,8 +103,8 @@
                     chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
                 }
             }, (error) => {
-                alert("❌ Error fetching messages:", error);
-                //alert("❌ Error loading messages. Check console.");
+                console.error("❌ Error fetching messages:", error);
+                alert("❌ Error loading messages. Check console.");
             });
         }
     </script>
