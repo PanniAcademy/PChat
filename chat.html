@@ -17,8 +17,7 @@
                 if (user) {
                     userEmail = user.email;
                     document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
-                    console.log("✅ Logged in as:", userEmail);
-                    loadMessages(); // Load messages when user is logged in
+                    loadMessages();
                 } else {
                     alert("⚠ Please log in first.");
                     window.location.href = "login.html";
@@ -40,8 +39,7 @@
                     timestamp: serverTimestamp()
                 });
 
-                console.log("✅ Message sent:", msg);
-                document.getElementById("message").value = ""; // Clear input after sending
+                document.getElementById("message").value = ""; // Clear input
             } catch (error) {
                 console.error("❌ Error sending message:", error);
                 alert("❌ Error: " + error.message);
@@ -53,7 +51,6 @@
 
             const messagesRef = collection(db, "messages");
 
-            // Fetch messages where sender or recipient is either userEmail or recipientEmail
             const q = query(
                 messagesRef,
                 where("sender", "in", [userEmail, recipientEmail]),
@@ -63,12 +60,7 @@
 
             onSnapshot(q, (snapshot) => {
                 let chatBox = document.getElementById("chatBox");
-                chatBox.innerHTML = ""; // Clear chat before updating
-
-                if (snapshot.empty) {
-                    chatBox.innerHTML = "<p>No messages yet.</p>";
-                    return;
-                }
+                chatBox.innerHTML = "";
 
                 snapshot.forEach(doc => {
                     let data = doc.data();
@@ -79,10 +71,7 @@
                     chatBox.appendChild(msg);
                 });
 
-                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
-            }, (error) => {
-                console.error("❌ Firestore Error:", error);
-                alert("⚠ Could not load messages. Check Firestore rules.");
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
         }
     </script>
