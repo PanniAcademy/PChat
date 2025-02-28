@@ -25,6 +25,8 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     userEmail = user.email;
+                    console.log("✅ Logged in as:", userEmail);
+
                     document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
                     loadMessages();
                 } else {
@@ -41,6 +43,8 @@
             if (!msg) return;
 
             try {
+                console.log("📩 Sending message:", msg);
+
                 await addDoc(collection(db, "messages"), {
                     sender: userEmail,
                     recipient: recipientEmail,
@@ -49,6 +53,7 @@
                 });
 
                 document.getElementById("message").value = ""; // Clear input
+                console.log("✅ Message sent!");
             } catch (error) {
                 console.error("❌ Error sending message:", error);
                 alert("❌ Error: " + error.message);
@@ -56,11 +61,15 @@
         }
 
         function loadMessages() {
-            if (!userEmail || !recipientEmail) return;
+            if (!userEmail || !recipientEmail) {
+                console.log("⚠ User email or recipient missing.");
+                return;
+            }
+
+            console.log("🔄 Loading messages between", userEmail, "and", recipientEmail);
 
             const messagesRef = collection(db, "messages");
 
-            // Query to get messages between both users
             const q = query(
                 messagesRef,
                 where("sender", "in", [userEmail, recipientEmail]),
@@ -72,14 +81,18 @@
             chatBox.innerHTML = "<p>Loading messages...</p>";
 
             onSnapshot(q, (snapshot) => {
+                console.log("📡 Messages updated in real-time!");
+
                 chatBox.innerHTML = ""; // Clear previous messages
 
                 if (snapshot.empty) {
                     chatBox.innerHTML = "<p>No messages yet. Say hello! 👋</p>";
+                    console.log("ℹ No messages found.");
                 } else {
                     snapshot.forEach(doc => {
                         let data = doc.data();
-                        
+                        console.log("📨 Message received:", data);
+
                         let msg = document.createElement("div");
                         msg.classList.add("message");
                         msg.classList.add(data.sender === userEmail ? "sent" : "received");
@@ -89,6 +102,9 @@
 
                     chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
                 }
+            }, (error) => {
+                console.error("❌ Error fetching messages:", error);
+                alert("❌ Error loading messages. Check console.");
             });
         }
     </script>
