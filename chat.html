@@ -5,13 +5,14 @@
     <script type="module">
         import { auth, db } from "./firebase-config.js";
         import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 
         const params = new URLSearchParams(window.location.search);
         const recipientEmail = params.get("email");
         let userEmail = null;
 
         document.addEventListener("DOMContentLoaded", () => {
-            auth.onAuthStateChanged(user => {
+            onAuthStateChanged(auth, (user) => {
                 if (user) {
                     userEmail = user.email;
                     document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
@@ -46,8 +47,10 @@
         function loadMessages() {
             if (!userEmail || !recipientEmail) return;
 
+            const messagesRef = collection(db, "messages");
+
             const q = query(
-                collection(db, "messages"),
+                messagesRef,
                 where("sender", "in", [userEmail, recipientEmail]),
                 where("recipient", "in", [userEmail, recipientEmail]),
                 orderBy("timestamp", "asc")
