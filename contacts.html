@@ -1,12 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
     <title>PChat - Contacts</title>
     <script type="module">
-        import { auth, db, onAuthStateChanged, collection, addDoc, query, where, onSnapshot, getDocs } from "./firebase-config.js";
+        import { auth, db } from "./firebase-config.js";
+        import { collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 
         let userEmail = null;
 
@@ -14,7 +14,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userEmail = user.email;
-                alert("✅ Logged in as: " + userEmail);
+                console.log("✅ Logged in as:", userEmail);
                 loadContacts();
             } else {
                 alert("⚠ Please log in first.");
@@ -30,10 +30,67 @@
                 return;
             }
 
+            console.log("🔹 Adding contact:", contactEmail, "for user:", userEmail); // Debugging log
+
             try {
                 // Check if the contact already exists
                 const contactQuery = query(collection(db, "contacts"), where("owner", "==", userEmail), where("contact", "==", contactEmail));
                 const querySnapshot = await getDocs(contactQuery);
+
+                if (!querySnapshot.empty) {
+                    alert("⚠ Contact already exists!");
+                    return;
+                }
+
+                // Add contact to Firestore
+                await addDoc(collection(db, "contacts"), {
+                    owner: userEmail,
+                    contact: contactEmail
+                });
+
+                alert("✅ Contact added successfully!");
+                document.getElementById("contactEmail").value = ""; // Clear input field
+            } catch (error) {
+                console.error("❌ Error adding contact:", error);
+                alert("❌ Error: " + error.message);
+            }
+        }
+
+        function loadContacts() {
+            if (!userEmail) return;
+
+            const q = query(collection(db, "contacts"), where("owner", "==", userEmail));
+
+            onSnapshot(q, (snapshot) => {
+                let list = document.getElementById("contactList");
+                list.innerHTML = "";
+
+                if (snapshot.empty) {
+                    list.innerHTML = "<li>No contacts added yet.</li>";
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    let li = document.createElement("li");
+                    let contactEmail = doc.data().contact;
+                    li.innerHTML = `<a href="chat.html?email=${contactEmail}">${contactEmail}</a>`;
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        window.addContact = addContact;
+    </script>
+
+    <link rel="stylesheet" href="contacts.css">
+</head>
+<body>
+    <h2>PChat - Contacts</h2>
+    <input type="text" id="contactEmail" placeholder="Enter Contact's Email">
+    <button onclick="addContact()">Add Contact</button>
+    <ul id="contactList"></ul>
+</body>
+</html>
 
                 if (!querySnapshot.empty) {
                     alert("⚠ Contact already exists!");
