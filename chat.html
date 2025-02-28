@@ -99,7 +99,7 @@
                 );
 
                 const testSnapshot = await getDocs(testQuery);
-                console.log("📡 Firestore Test Query Result:", testSnapshot.docs.map(doc => doc.data()));
+                alert("📡 Firestore Test Query Result:", testSnapshot.docs.map(doc => doc.data()));
 
             } catch (error) {
                 console.error("❌ Firestore Test Query Failed:", error.code, error.message);
