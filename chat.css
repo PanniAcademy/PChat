@@ -34,14 +34,23 @@ body {
 .sent {
     background-color: #0b93f6;
     color: white;
-    align-self: flex-end;
     text-align: right;
+    float: right;
+    clear: both;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
 }
 
 .received {
     background-color: #444;
     color: white;
-    align-self: flex-start;
+    text-align: left;
+    float: left;
+    clear: both;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
 }
 
 #messageInput {
