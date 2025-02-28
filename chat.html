@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
     <title>PChat - Chat</title>
     <script type="module">
         import { auth, db } from "./firebase-config.js";
@@ -56,33 +55,26 @@
 
             const q = query(
                 messagesRef,
-                where("sender", "==", userEmail),
-                where("recipient", "==", recipientEmail)
+                where("sender", "in", [userEmail, recipientEmail]),
+                where("recipient", "in", [userEmail, recipientEmail]),
+                orderBy("timestamp", "asc")
             );
 
-            const qReverse = query(
-                messagesRef,
-                where("sender", "==", recipientEmail),
-                where("recipient", "==", userEmail)
-            );
+            onSnapshot(q, (snapshot) => {
+                let chatBox = document.getElementById("chatBox");
+                chatBox.innerHTML = ""; // ✅ Clear old messages to prevent duplicates
 
-            onSnapshot(q, updateChatBox);
-            onSnapshot(qReverse, updateChatBox);
-        }
+                snapshot.forEach(doc => {
+                    let data = doc.data();
+                    let msg = document.createElement("div");
+                    msg.classList.add("message");
+                    msg.classList.add(data.sender === userEmail ? "sent" : "received");
+                    msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
+                    chatBox.appendChild(msg);
+                });
 
-        function updateChatBox(snapshot) {
-            let chatBox = document.getElementById("chatBox");
-
-            snapshot.forEach(doc => {
-                let data = doc.data();
-                let msg = document.createElement("div");
-                msg.classList.add("message");
-                msg.classList.add(data.sender === userEmail ? "sent" : "received");
-                msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
-                chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
             });
-
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
         }
     </script>
 
