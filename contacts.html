@@ -4,9 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PChat - Contacts</title>
     <script type="module">
-        import { auth, db } from "./firebase-config.js";
+        import { auth, db, onAuthStateChanged } from "./firebase-config.js";
         import { collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 
         let userEmail = null;
 
@@ -14,7 +13,6 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userEmail = user.email;
-                console.log("✅ Logged in as:", userEmail);
                 loadContacts();
             } else {
                 alert("⚠ Please log in first.");
@@ -24,13 +22,10 @@
 
         async function addContact() {
             let contactEmail = document.getElementById("contactEmail").value.trim();
-
             if (!contactEmail || contactEmail === userEmail) {
                 alert("⚠ Enter a valid email (not your own)!");
                 return;
             }
-
-            alert("🔹 Adding contact:", contactEmail, "for user:", userEmail); // Debugging log
 
             try {
                 // Check if the contact already exists
@@ -49,7 +44,7 @@
                 });
 
                 alert("✅ Contact added successfully!");
-                document.getElementById("contactEmail").value = ""; // Clear input field
+                document.getElementById("contactEmail").value = ""; // Clear input
             } catch (error) {
                 console.error("❌ Error adding contact:", error);
                 alert("❌ Error: " + error.message);
@@ -67,12 +62,11 @@
 
                 if (snapshot.empty) {
                     list.innerHTML = "<li>No contacts added yet.</li>";
-                    return;
                 }
 
                 snapshot.forEach((doc) => {
-                    let li = document.createElement("li");
                     let contactEmail = doc.data().contact;
+                    let li = document.createElement("li");
                     li.innerHTML = `<a href="chat.html?email=${contactEmail}">${contactEmail}</a>`;
                     list.appendChild(li);
                 });
@@ -91,5 +85,3 @@
     <ul id="contactList"></ul>
 </body>
 </html>
-
-            
