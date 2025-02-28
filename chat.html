@@ -41,7 +41,7 @@
                     timestamp: serverTimestamp()
                 });
 
-                alert("✅ Message sent:", msg);
+                console.log("✅ Message sent:", msg);
                 document.getElementById("message").value = ""; // Clear input
             } catch (error) {
                 console.error("❌ Error sending message:", error);
@@ -56,34 +56,33 @@
 
             const q = query(
                 messagesRef,
-                where("sender", "in", [userEmail, recipientEmail]),
-                where("recipient", "in", [userEmail, recipientEmail]),
-                orderBy("timestamp", "asc")
+                where("sender", "==", userEmail),
+                where("recipient", "==", recipientEmail)
             );
 
-            onSnapshot(q, (snapshot) => {
-                let chatBox = document.getElementById("chatBox");
-                chatBox.innerHTML = "";
+            const qReverse = query(
+                messagesRef,
+                where("sender", "==", recipientEmail),
+                where("recipient", "==", userEmail)
+            );
 
-                if (snapshot.empty) {
-                    alert("⚠ No messages found.");
-                } else {
-                    alert("📩 Messages received:", snapshot.size);
-                }
+            onSnapshot(q, updateChatBox);
+            onSnapshot(qReverse, updateChatBox);
+        }
 
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-                    alert("💬 Message Data:", data);
+        function updateChatBox(snapshot) {
+            let chatBox = document.getElementById("chatBox");
 
-                    let msg = document.createElement("div");
-                    msg.classList.add("message");
-                    msg.classList.add(data.sender === userEmail ? "sent" : "received");
-                    msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
-                    chatBox.appendChild(msg);
-                });
-
-                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
+            snapshot.forEach(doc => {
+                let data = doc.data();
+                let msg = document.createElement("div");
+                msg.classList.add("message");
+                msg.classList.add(data.sender === userEmail ? "sent" : "received");
+                msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
+                chatBox.appendChild(msg);
             });
+
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
         }
     </script>
 
