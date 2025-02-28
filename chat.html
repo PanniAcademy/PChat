@@ -66,7 +66,7 @@
                 return;
             }
 
-            alert(`🔄 Fetching messages between ${userEmail} and ${recipientEmail}`);
+            console.log(`🔄 Fetching messages between ${userEmail} and ${recipientEmail}`);
 
             const messagesRef = collection(db, "messages");
 
@@ -103,8 +103,8 @@
                     chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
                 }
             }, (error) => {
-                console.error("❌ Error fetching messages:", error);
-                alert("❌ Error loading messages. Check console.");
+                alert("❌ Error fetching messages:", error);
+                //alert("❌ Error loading messages. Check console.");
             });
         }
     </script>
