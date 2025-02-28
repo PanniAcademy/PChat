@@ -18,6 +18,7 @@
                 if (user) {
                     userEmail = user.email;
                     document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
+                    console.log("✅ Logged in as:", userEmail);
                     loadMessages();
                 } else {
                     alert("⚠ Please log in first.");
@@ -40,9 +41,11 @@
                     timestamp: serverTimestamp()
                 });
 
+                console.log("✅ Message sent:", msg);
                 document.getElementById("message").value = ""; // Clear input
             } catch (error) {
-                alert("❌ Error sending message: " + error.message);
+                console.error("❌ Error sending message:", error);
+                alert("❌ Error: " + error.message);
             }
         }
 
@@ -62,8 +65,16 @@
                 let chatBox = document.getElementById("chatBox");
                 chatBox.innerHTML = "";
 
+                if (snapshot.empty) {
+                    console.log("⚠ No messages found.");
+                } else {
+                    console.log("📩 Messages received:", snapshot.size);
+                }
+
                 snapshot.forEach(doc => {
                     let data = doc.data();
+                    console.log("💬 Message Data:", data);
+
                     let msg = document.createElement("div");
                     msg.classList.add("message");
                     msg.classList.add(data.sender === userEmail ? "sent" : "received");
