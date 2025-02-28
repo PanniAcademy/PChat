@@ -53,12 +53,13 @@
 
             const messagesRef = collection(db, "messages");
 
-            const q = query(
-                messagesRef,
-                where("sender", "in", [userEmail, recipientEmail]),
-                where("recipient", "in", [userEmail, recipientEmail]),
-                orderBy("timestamp", "asc")
-            );
+const q = query(
+    messagesRef,
+    where("sender", "in", [userEmail, recipientEmail]),
+    where("recipient", "in", [userEmail, recipientEmail]),
+    orderBy("timestamp") // Firestore automatically sorts by ascending order
+);
+
 
             // 🔥 TEST QUERY
             await testFirestoreQuery(); 
