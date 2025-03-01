@@ -60,7 +60,6 @@ async function sendMessage(contactEmail) {
         });
 
         document.getElementById("messageInput").value = "";
-        loadChat(contactEmail);
     } catch (error) {
         alert("❌ Error sending message: " + error.message);
     }
