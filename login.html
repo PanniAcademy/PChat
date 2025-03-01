@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PChat</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js before using it -->
 </head>
 <body>
     <h2>Login to PChat</h2>
@@ -13,24 +14,18 @@
     <button id="loginBtn">Login</button>
     <button id="signupBtn">Sign Up</button>
 
-    <script type="module">
-        import { auth } from './firebase.js';
-        import { 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword 
-        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-
-        document.addEventListener("DOMContentLoaded", () => {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
             alert("✅ JavaScript is running! Now setting up Firebase...");
 
-            document.getElementById("loginBtn").addEventListener("click", async () => {
+            document.getElementById("loginBtn").addEventListener("click", async function () {
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
                 alert("🔵 Login button clicked");
 
                 try {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    await window.signInWithEmailAndPassword(window.auth, email, password);
                     alert("✅ Login successful!");
                     window.location.href = "contacts.html";
                 } catch (error) {
@@ -38,14 +33,14 @@
                 }
             });
 
-            document.getElementById("signupBtn").addEventListener("click", async () => {
+            document.getElementById("signupBtn").addEventListener("click", async function () {
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
                 alert("🟢 Signup button clicked");
 
                 try {
-                    await createUserWithEmailAndPassword(auth, email, password);
+                    await window.createUserWithEmailAndPassword(window.auth, email, password);
                     alert("✅ Signup successful!");
                     window.location.href = "contacts.html";
                 } catch (error) {
