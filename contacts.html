@@ -1,87 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PChat - Contacts</title>
-    <script type="module">
-        import { auth, db, onAuthStateChanged } from "./firebase-config.js";
-        import { collection, addDoc, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
-
-        let userEmail = null;
-
-        // Wait for Firebase Auth to be ready
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userEmail = user.email;
-                loadContacts();
-            } else {
-                alert("⚠ Please log in first.");
-                window.location.href = "login.html";
-            }
-        });
-
-        async function addContact() {
-            let contactEmail = document.getElementById("contactEmail").value.trim();
-            if (!contactEmail || contactEmail === userEmail) {
-                alert("⚠ Enter a valid email (not your own)!");
-                return;
-            }
-
-            try {
-                // Check if the contact already exists
-                const contactQuery = query(collection(db, "contacts"), where("owner", "==", userEmail), where("contact", "==", contactEmail));
-                const querySnapshot = await getDocs(contactQuery);
-
-                if (!querySnapshot.empty) {
-                    alert("⚠ Contact already exists!");
-                    return;
-                }
-
-                // Add contact to Firestore
-                await addDoc(collection(db, "contacts"), {
-                    owner: userEmail,
-                    contact: contactEmail
-                });
-
-                alert("✅ Contact added successfully!");
-                document.getElementById("contactEmail").value = ""; // Clear input
-            } catch (error) {
-                console.error("❌ Error adding contact:", error);
-                alert("❌ Error: " + error.message);
-            }
-        }
-
-        function loadContacts() {
-            if (!userEmail) return;
-
-            const q = query(collection(db, "contacts"), where("owner", "==", userEmail));
-
-            onSnapshot(q, (snapshot) => {
-                let list = document.getElementById("contactList");
-                list.innerHTML = "";
-
-                if (snapshot.empty) {
-                    list.innerHTML = "<li>No contacts added yet.</li>";
-                }
-
-                snapshot.forEach((doc) => {
-                    let contactEmail = doc.data().contact;
-                    let li = document.createElement("li");
-                    li.innerHTML = `<a href="chat.html?email=${contactEmail}">${contactEmail}</a>`;
-                    list.appendChild(li);
-                });
-            });
-        }
-
-        window.addContact = addContact;
-    </script>
-
-    <link rel="stylesheet" href="contacts.css">
+    <title>Contacts - PChat</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>PChat - Contacts</h2>
-    <input type="text" id="contactEmail" placeholder="Enter Contact's Email">
+    <h2>Your Contacts</h2>
+    <input type="email" id="contactEmail" placeholder="Enter contact email">
     <button onclick="addContact()">Add Contact</button>
-    <ul id="contactList"></ul>
+    <ul id="contactsList"></ul>
+
+    <script type="module">
+        import { db, auth } from './firebase.js';
+        import { collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
+
+        async function addContact() {
+            let contactEmail = document.getElementById("contactEmail").value;
+            await addDoc(collection(db, "contacts"), {
+                user: auth.currentUser.email,
+                contact: contactEmail
+            });
+            loadContacts();
+        }
+
+        async function loadContacts() {
+            let contactsList = document.getElementById("contactsList");
+            contactsList.innerHTML = "";
+            let querySnapshot = await getDocs(collection(db, "contacts"));
+            querySnapshot.forEach(doc => {
+                let data = doc.data();
+                if (data.user === auth.currentUser.email) {
+                    let li = document.createElement("li");
+                    li.innerHTML = `<a href="chat.html?contact=${data.contact}">${data.contact}</a>`;
+                    contactsList.appendChild(li);
+                }
+            });
+        }
+        loadContacts();
+    </script>
 </body>
 </html>
