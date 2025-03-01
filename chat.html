@@ -14,86 +14,86 @@
     <button id="sendBtn">Send</button>
 
 <script type="module">
-    import { auth, db, doc, onSnapshot, setDoc, updateDoc, arrayUnion } from './firebase.js';
+document.addEventListener("DOMContentLoaded", function () {
+    let params = new URLSearchParams(window.location.search);
+    let contactEmail = params.get("contact");
 
-    document.addEventListener("DOMContentLoaded", function () {
-        let params = new URLSearchParams(window.location.search);
-        let contactEmail = params.get("contact");
+    if (!contactEmail) {
+        alert("❌ No contact selected! Redirecting...");
+        window.location.href = "contacts.html";
+        return;
+    }
 
-        if (!contactEmail) {
-            alert("❌ No contact selected! Redirecting...");
-            window.location.href = "contacts.html";
-            return;
-        }
+    document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
+    loadChat(contactEmail);
 
-        document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
-        loadChat(contactEmail);
-
-        document.getElementById("sendBtn").addEventListener("click", function () {
-            sendMessage(contactEmail);
-        });
+    document.getElementById("sendBtn").addEventListener("click", function () {
+        sendMessage(contactEmail);
     });
+});
 
-    async function sendMessage(contactEmail) {
-        let message = document.getElementById("messageInput").value.trim();
-        if (!message) {
-            alert("❌ Enter a message!");
-            return;
-        }
-
-        let user = auth.currentUser;
-        if (!user) {
-            alert("❌ No user logged in! Redirecting...");
-            window.location.href = "login.html";
-            return;
-        }
-
-        try {
-            let chatID = generateChatID(user.email, contactEmail);
-            let chatRef = doc(db, "chats", chatID);
-
-            await setDoc(chatRef, { messages: [] }, { merge: true });
-            await updateDoc(chatRef, { 
-                messages: arrayUnion({
-                    sender: user.email,
-                    text: message,
-                    timestamp: Date.now()
-                })
-            });
-
-            document.getElementById("messageInput").value = "";
-        } catch (error) {
-            alert("❌ Error sending message: " + error.message);
-        }
+async function sendMessage(contactEmail) {
+    let message = document.getElementById("messageInput").value.trim();
+    if (!message) {
+        alert("❌ Enter a message!");
+        return;
     }
 
-    function loadChat(contactEmail) {
-        let user = auth.currentUser;
-        if (!user) return;
+    let user = window.auth.currentUser;
+    if (!user) {
+        alert("❌ No user logged in! Redirecting...");
+        window.location.href = "login.html";
+        return;
+    }
 
+    try {
         let chatID = generateChatID(user.email, contactEmail);
-        let chatRef = doc(db, "chats", chatID);
-        let chatBox = document.getElementById("chatBox");
+        let chatRef = window.firestore.doc(window.db, "chats", chatID);
 
-        // ✅ Listen for real-time message updates
-        onSnapshot(chatRef, (docSnap) => {
-            chatBox.innerHTML = ""; // Clear old messages
-            if (docSnap.exists()) {
-                let messages = docSnap.data().messages || [];
-                messages.forEach(msg => {
-                    let div = document.createElement("div");
-                    div.textContent = `${msg.sender}: ${msg.text}`;
-                    chatBox.appendChild(div);
-                });
-            }
-        }, (error) => {
-            alert("❌ Error loading messages: " + error.message);
+        await window.firestore.setDoc(chatRef, { messages: [] }, { merge: true });
+        await window.firestore.updateDoc(chatRef, { 
+            messages: window.firestore.arrayUnion({
+                sender: user.email,
+                text: message,
+                timestamp: Date.now()
+            })
         });
-    }
 
-    function generateChatID(email1, email2) {
-        return [email1, email2].sort().join("_");
+        document.getElementById("messageInput").value = "";
+        loadChat(contactEmail);
+    } catch (error) {
+        alert("❌ Error sending message: " + error.message);
     }
+}
+
+function loadChat(contactEmail) {
+    let user = window.auth.currentUser;
+    if (!user) return;
+
+    let chatID = generateChatID(user.email, contactEmail);
+    let chatRef = window.firestore.doc(window.db, "chats", chatID);
+    let chatBox = document.getElementById("chatBox");
+
+    // ✅ Listen for real-time message updates
+    window.firestore.onSnapshot(chatRef, (docSnap) => {
+        chatBox.innerHTML = ""; // Clear old messages
+        if (docSnap.exists()) {
+            let messages = docSnap.data().messages || [];
+            messages.forEach(msg => {
+                let div = document.createElement("div");
+                div.textContent = `${msg.sender}: ${msg.text}`;
+                chatBox.appendChild(div);
+            });
+        }
+    }, (error) => {
+        alert("❌ Error loading messages: " + error.message);
+    });
+}
+
+function generateChatID(email1, email2) {
+    return [email1, email2].sort().join("_");
+}
+
 </script>
 
 </body>
