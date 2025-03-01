@@ -5,40 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacts - PChat</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js -->
 </head>
 <body>
     <h2>Your Contacts</h2>
-    <input type="email" id="contactEmail" placeholder="Enter contact email">
-    <button onclick="addContact()">Add Contact</button>
-    <ul id="contactsList"></ul>
+    <input type="text" id="contactEmail" placeholder="Enter contact's email">
+    <button id="addContactBtn">Add Contact</button>
+    
+    <h3>Contact List:</h3>
+    <ul id="contactList"></ul>
 
-    <script type="module">
-        import { db, auth } from './firebase.js';
-        import { collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            alert("✅ Contacts page loaded!");
 
-        async function addContact() {
-            let contactEmail = document.getElementById("contactEmail").value;
-            await addDoc(collection(db, "contacts"), {
-                user: auth.currentUser.email,
-                contact: contactEmail
-            });
-            loadContacts();
-        }
+            let user = window.auth.currentUser;
 
-        async function loadContacts() {
-            let contactsList = document.getElementById("contactsList");
-            contactsList.innerHTML = "";
-            let querySnapshot = await getDocs(collection(db, "contacts"));
-            querySnapshot.forEach(doc => {
-                let data = doc.data();
-                if (data.user === auth.currentUser.email) {
-                    let li = document.createElement("li");
-                    li.innerHTML = `<a href="chat.html?contact=${data.contact}">${data.contact}</a>`;
-                    contactsList.appendChild(li);
+            if (!user) {
+                alert("❌ No user logged in! Redirecting to login...");
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("addContactBtn").addEventListener("click", async function () {
+                let contactEmail = document.getElementById("contactEmail").value;
+
+                if (!contactEmail) {
+                    alert("❌ Enter a contact email!");
+                    return;
+                }
+
+                try {
+                    let userId = user.uid;
+                    let contactRef = window.db.collection("contacts").doc(userId);
+
+                    await contactRef.set({
+                        contacts: window.firebase.firestore.FieldValue.arrayUnion(contactEmail)
+                    }, { merge: true });
+
+                    alert("✅ Contact added!");
+                    loadContacts();
+                } catch (error) {
+                    alert("❌ Error: " + error.message);
                 }
             });
-        }
-        loadContacts();
+
+            async function loadContacts() {
+                let contactList = document.getElementById("contactList");
+                contactList.innerHTML = "";
+
+                try {
+                    let userId = user.uid;
+                    let contactRef = window.db.collection("contacts").doc(userId);
+                    let doc = await contactRef.get();
+
+                    if (doc.exists) {
+                        let contacts = doc.data().contacts || [];
+                        contacts.forEach(email => {
+                            let li = document.createElement("li");
+                            li.textContent = email;
+                            contactList.appendChild(li);
+                        });
+                    }
+                } catch (error) {
+                    alert("❌ Error loading contacts: " + error.message);
+                }
+            }
+
+            loadContacts();
+        });
     </script>
 </body>
 </html>
