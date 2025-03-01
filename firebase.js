@@ -1,22 +1,21 @@
-// firebase.js - Corrected Version
+// firebase.js - Fix for Import Issues
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
 
-// 🔴 Corrected Firebase Configuration
+// 🔴 YOUR FIREBASE CONFIGURATION
 const firebaseConfig = {
     apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
     authDomain: "pchat-cd031.firebaseapp.com",
     projectId: "pchat-cd031",
-    storageBucket: "pchat-cd031.appspot.com", // ✅ FIXED STORAGE BUCKET
+    storageBucket: "pchat-cd031.appspot.com",
     messagingSenderId: "943721700844",
-    appId: "1:943721700844:web:eaafc6214592a5260834c9",
-    measurementId: "G-HJSX8FGMTB"
+    appId: "1:943721700844:web:eaafc6214592a5260834c9"
 };
 
-// Initialize Firebase
+// 🔥 Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+window.auth = getAuth(app);  // ✅ Attach to window so login.html can access it
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+window.db = getFirestore(app);
