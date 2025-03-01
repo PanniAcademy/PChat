@@ -4,52 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PChat</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background-color: #121212; /* Dark background */
-            color: #e0e0e0; /* Light text */
-        }
-
-        h1 {
-            color: #00bcd4; /* Cool blue heading */
-        }
-
-        p {
-            color: #b0bec5; /* Light grey text */
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 20px auto;
-        }
-
-        button {
-            padding: 12px 25px;
-            background-color: #00bcd4; /* Cool blue button */
-            color: #121212; /* Dark button text */
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #008394; /* Darker cool blue hover */
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Welcome to PChat</h1>
-    <p>Tired of complicated messaging apps? PChat is here to make chatting simple and fun! Connect with your friends instantly, share your thoughts, and stay in touch without any fuss.</p>
+    <div class="container">
+        <header>
+            <h1>Welcome to PChat</h1>
+            <p class="subtitle">Chat freely and securely with your friends.</p>
+        </header>
 
-    <p>Imagine having a place where you can chat freely, knowing your conversations are safe and secure. PChat uses the latest technology to protect your messages, so you can focus on what matters: connecting with the people you care about.</p>
+        <section class="features">
+            <div class="feature">
+                <img src="path/to/secure-icon.png" alt="Secure Chat Icon">
+                <h3>Secure Messaging</h3>
+                <p>Your conversations are protected with strong encryption.</p>
+            </div>
+            <div class="feature">
+                <img src="path/to/easy-icon.png" alt="Easy to Use Icon">
+                <h3>Easy to Use</h3>
+                <p>Simple and intuitive interface for seamless chatting.</p>
+            </div>
+            <div class="feature">
+                <img src="path/to/friends-icon.png" alt="Connect with Friends Icon">
+                <h3>Connect with Friends</h3>
+                <p>Stay in touch with your friends anytime, anywhere.</p>
+            </div>
+        </section>
 
-    <p>Whether you want to share a funny meme, plan a hangout, or just have a quick chat, PChat is perfect for you. It's easy to use, and you can access it from any device. Plus, it's totally free!</p>
-
-    <p>Ready to experience hassle-free chatting? Click the button below and join the PChat community today!</p>
-
-    <button onclick="location.href='login.html'">Try it for Free</button>
+        <section class="cta">
+            <p>Ready to experience hassle-free chatting? Join PChat today!</p>
+            <button onclick="location.href='login.html'">Try it for Free</button>
+        </section>
+    </div>
 </body>
 </html>
