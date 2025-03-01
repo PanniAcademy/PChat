@@ -4,13 +4,15 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 // Firebase Configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "YOUR_CONFIG_HERE",
-    authDomain: "YOUR_CONFIG_HERE",
-    projectId: "YOUR_CONFIG_HERE",
-    storageBucket: "YOUR_CONFIG_HERE",
-    messagingSenderId: "YOUR_CONFIG_HERE",
-    appId: "YOUR_CONFIG_HERE"
+  apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
+  authDomain: "pchat-cd031.firebaseapp.com",
+  projectId: "pchat-cd031",
+  storageBucket: "pchat-cd031.firebasestorage.app",
+  messagingSenderId: "943721700844",
+  appId: "1:943721700844:web:eaafc6214592a5260834c9",
+  measurementId: "G-HJSX8FGMTB"
 };
 
 // Initialize Firebase
