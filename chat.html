@@ -1,125 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PChat - Chat</title>
+    <title>Chat - PChat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Chat</h2>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+
     <script type="module">
-        import { auth, db } from "./firebase-config.js";
-        import { 
-            collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, getDocs
-        } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+        import { db, auth } from './firebase.js';
+        import { collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
 
-        const params = new URLSearchParams(window.location.search);
-        const recipientEmail = params.get("email");
-        let userEmail = null;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    userEmail = user.email;
-                    document.getElementById("chatHeader").innerText = "Chat with " + recipientEmail;
-                    loadMessages();
-                } else {
-                    alert("⚠ Please log in first.");
-                    window.location.href = "login.html";
-                }
-            });
-
-            document.getElementById("sendMessageBtn").addEventListener("click", sendMessage);
-        });
+        const urlParams = new URLSearchParams(window.location.search);
+        const contact = urlParams.get('contact');
 
         async function sendMessage() {
-            let msg = document.getElementById("message").value.trim();
-            if (!msg) return;
-
-            try {
-                await addDoc(collection(db, "messages"), {
-                    sender: userEmail,
-                    recipient: recipientEmail,
-                    text: msg,
-                    timestamp: serverTimestamp()
-                });
-
-                document.getElementById("message").value = ""; // Clear input
-                alert("✅ Message sent!");
-            } catch (error) {
-                alert("❌ Error sending message: " + error.code + " - " + error.message);
-            }
+            let message = document.getElementById("messageInput").value;
+            await addDoc(collection(db, "messages"), {
+                sender: auth.currentUser.email,
+                receiver: contact,
+                text: message,
+                timestamp: new Date()
+            });
+            loadMessages();
         }
 
         async function loadMessages() {
-            if (!userEmail || !recipientEmail) return;
-
-            const messagesRef = collection(db, "messages");
-
-            const q = query(
-                messagesRef,
-                where("sender", "in", [userEmail, recipientEmail]),
-                orderBy("timestamp", "asc")
-            );
-
-            // 🔥 Firestore Test Query (to check permissions)
-            await testFirestoreQuery(); 
-
-            onSnapshot(q, (snapshot) => {
-                let chatBox = document.getElementById("chatBox");
-                chatBox.innerHTML = "";
-
-                if (snapshot.empty) {
-                    chatBox.innerHTML = "<p>No messages found.</p>";
-                    alert("ℹ No messages found.");
+            let messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML = "";
+            let querySnapshot = await getDocs(collection(db, "messages"));
+            querySnapshot.forEach(doc => {
+                let data = doc.data();
+                if ((data.sender === auth.currentUser.email && data.receiver === contact) ||
+                    (data.sender === contact && data.receiver === auth.currentUser.email)) {
+                    let p = document.createElement("p");
+                    p.innerText = `${data.sender}: ${data.text}`;
+                    messagesDiv.appendChild(p);
                 }
-
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-
-                    if ((data.sender === userEmail && data.recipient === recipientEmail) || 
-                        (data.sender === recipientEmail && data.recipient === userEmail)) {
-                        
-                        let msg = document.createElement("div");
-                        msg.classList.add("message");
-                        msg.classList.add(data.sender === userEmail ? "sent" : "received");
-                        msg.innerHTML = `<span>${data.sender === userEmail ? "You" : data.sender}:</span> ${data.text}`;
-                        chatBox.appendChild(msg);
-                    }
-                });
-
-                chatBox.scrollTop = chatBox.scrollHeight;
-                alert("✅ Messages loaded!");
-            }, (error) => {
-                alert("❌ Error fetching messages: " + error.code + " - " + error.message);
             });
         }
-
-        async function testFirestoreQuery() {
-            try {
-                const messagesRef = collection(db, "messages");
-
-                const testQuery = query(
-                    messagesRef,
-                    where("sender", "in", [userEmail, recipientEmail]),
-                    orderBy("timestamp", "asc")
-                );
-
-                const testSnapshot = await getDocs(testQuery);
-                alert("📡 Firestore Test Query Successful: Found " + testSnapshot.docs.length + " messages.");
-            } catch (error) {
-                alert("❌ Firestore Query Failed: " + error.code + " - " + error.message);
-            }
-        }
+        loadMessages();
     </script>
-
-    <link rel="stylesheet" href="chat.css">
-</head>
-<body>
-    <div id="chatContainer">
-        <h2 id="chatHeader">PChat - Chat</h2>
-        <div id="chatBox"></div>
-        <div id="messageInput">
-            <input type="text" id="message" placeholder="Type a message">
-            <button id="sendMessageBtn">Send</button>
-        </div>
-    </div>
 </body>
 </html>
