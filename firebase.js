@@ -1,12 +1,13 @@
+// ✅ Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { 
     getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import { 
-    getFirestore, collection, doc, getDoc, setDoc, updateDoc, arrayUnion
+    getFirestore, collection, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
-// Firebase Configuration
+// ✅ Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
   authDomain: "pchat-cd031.firebaseapp.com",
@@ -17,7 +18,7 @@ const firebaseConfig = {
   measurementId: "G-HJSX8FGMTB"
 };
 
-// Initialize Firebase
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -30,4 +31,4 @@ window.db = db;
 window.authFunctions = { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged };
 
 // ✅ Store Firestore functions
-window.firestore = { collection, doc, getDoc, setDoc, updateDoc, arrayUnion };
+window.firestore = { collection, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot }; // ✅ Added onSnapshot
