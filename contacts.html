@@ -19,61 +19,67 @@
         document.addEventListener("DOMContentLoaded", function () {
             alert("✅ Contacts page loaded!");
 
-            let user = window.auth.currentUser;
-
-            if (!user) {
-                alert("❌ No user logged in! Redirecting to login...");
-                window.location.href = "login.html";
-                return;
-            }
-
-            document.getElementById("addContactBtn").addEventListener("click", async function () {
-                let contactEmail = document.getElementById("contactEmail").value;
-
-                if (!contactEmail) {
-                    alert("❌ Enter a contact email!");
+            // ✅ Wait for Firebase to load the user correctly
+            window.auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    alert("❌ No user logged in! Redirecting to login...");
+                    window.location.href = "login.html";
                     return;
                 }
 
-                try {
-                    let userId = user.uid;
-                    let contactRef = window.db.collection("contacts").doc(userId);
-
-                    await contactRef.set({
-                        contacts: window.firebase.firestore.FieldValue.arrayUnion(contactEmail)
-                    }, { merge: true });
-
-                    alert("✅ Contact added!");
-                    loadContacts();
-                } catch (error) {
-                    alert("❌ Error: " + error.message);
-                }
+                alert("✅ User detected: " + user.email);
+                loadContacts(user);
+                
+                document.getElementById("addContactBtn").addEventListener("click", function () {
+                    addContact(user);
+                });
             });
+        });
 
-            async function loadContacts() {
-                let contactList = document.getElementById("contactList");
-                contactList.innerHTML = "";
+        async function addContact(user) {
+            let contactEmail = document.getElementById("contactEmail").value;
 
-                try {
-                    let userId = user.uid;
-                    let contactRef = window.db.collection("contacts").doc(userId);
-                    let doc = await contactRef.get();
-
-                    if (doc.exists) {
-                        let contacts = doc.data().contacts || [];
-                        contacts.forEach(email => {
-                            let li = document.createElement("li");
-                            li.textContent = email;
-                            contactList.appendChild(li);
-                        });
-                    }
-                } catch (error) {
-                    alert("❌ Error loading contacts: " + error.message);
-                }
+            if (!contactEmail) {
+                alert("❌ Enter a contact email!");
+                return;
             }
 
-            loadContacts();
-        });
+            try {
+                let userId = user.uid;
+                let contactRef = window.db.collection("contacts").doc(userId);
+
+                await contactRef.set({
+                    contacts: window.firebase.firestore.FieldValue.arrayUnion(contactEmail)
+                }, { merge: true });
+
+                alert("✅ Contact added!");
+                loadContacts(user);
+            } catch (error) {
+                alert("❌ Error: " + error.message);
+            }
+        }
+
+        async function loadContacts(user) {
+            let contactList = document.getElementById("contactList");
+            contactList.innerHTML = "";
+
+            try {
+                let userId = user.uid;
+                let contactRef = window.db.collection("contacts").doc(userId);
+                let doc = await contactRef.get();
+
+                if (doc.exists) {
+                    let contacts = doc.data().contacts || [];
+                    contacts.forEach(email => {
+                        let li = document.createElement("li");
+                        li.textContent = email;
+                        contactList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                alert("❌ Error loading contacts: " + error.message);
+            }
+        }
     </script>
 </body>
 </html>
