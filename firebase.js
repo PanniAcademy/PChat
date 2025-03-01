@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 // Firebase Configuration
@@ -15,10 +15,15 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// ✅ Store Firestore and Auth in `window` to use in other files
+// ✅ Store Firebase objects globally for both login and contacts pages
 window.auth = auth;
 window.db = db;
-window.firestore = { collection, doc, getDoc, setDoc }; // ✅ Make Firestore functions accessible
+
+// ✅ Store Auth functions in `window.authFunctions`
+window.authFunctions = { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged };
+
+// ✅ Store Firestore functions in `window.firestore`
+window.firestore = { collection, doc, getDoc, setDoc };
