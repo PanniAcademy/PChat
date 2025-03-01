@@ -76,25 +76,35 @@ function loadChat(contactEmail) {
     let chatRef = window.firestore.doc(window.db, "chats", chatID);
     let chatBox = document.getElementById("chatBox");
 
-    // ✅ Listen for real-time message updates
     window.firestore.onSnapshot(chatRef, (docSnap) => {
         chatBox.innerHTML = ""; // Clear old messages
+
         if (docSnap.exists()) {
             let messages = docSnap.data().messages || [];
+
             messages.forEach(msg => {
                 let div = document.createElement("div");
                 div.textContent = `${msg.sender}: ${msg.text}`;
+                div.classList.add("message");
+
+                // ✅ Style messages based on sender
+                if (msg.sender === user.email) {
+                    div.classList.add("sent");
+                } else {
+                    div.classList.add("received");
+                }
+
                 chatBox.appendChild(div);
             });
+
+            // ✅ Auto-scroll to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
     }, (error) => {
         alert("❌ Error loading messages: " + error.message);
     });
 }
 
-function generateChatID(email1, email2) {
-    return [email1, email2].sort().join("_");
-}
 
 </script>
 
