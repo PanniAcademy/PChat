@@ -66,30 +66,30 @@
             }
         }
 
-        async function loadChat(contactEmail) {
-            let user = window.auth.currentUser;
-            if (!user) return;
+function loadChat(contactEmail) {
+    let user = window.auth.currentUser;
+    if (!user) return;
 
-            let chatID = generateChatID(user.email, contactEmail);
-            let chatRef = window.firestore.doc(window.db, "chats", chatID);
-            let chatBox = document.getElementById("chatBox");
+    let chatID = generateChatID(user.email, contactEmail);
+    let chatRef = window.firestore.doc(window.db, "chats", chatID);
+    let chatBox = document.getElementById("chatBox");
 
-            try {
-                let docSnap = await window.firestore.getDoc(chatRef);
-
-                chatBox.innerHTML = ""; // Clear old messages
-                if (docSnap.exists()) {
-                    let messages = docSnap.data().messages || [];
-                    messages.forEach(msg => {
-                        let div = document.createElement("div");
-                        div.textContent = `${msg.sender}: ${msg.text}`;
-                        chatBox.appendChild(div);
-                    });
-                }
-            } catch (error) {
-                alert("❌ Error loading messages: " + error.message);
-            }
+    // ✅ Listen for real-time message updates
+    window.firestore.onSnapshot(chatRef, (docSnap) => {
+        chatBox.innerHTML = ""; // Clear old messages
+        if (docSnap.exists()) {
+            let messages = docSnap.data().messages || [];
+            messages.forEach(msg => {
+                let div = document.createElement("div");
+                div.textContent = `${msg.sender}: ${msg.text}`;
+                chatBox.appendChild(div);
+            });
         }
+    }, (error) => {
+        alert("❌ Error loading messages: " + error.message);
+    });
+}
+
 
         function generateChatID(email1, email2) {
             return [email1, email2].sort().join("_");
