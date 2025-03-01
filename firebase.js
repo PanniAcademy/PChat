@@ -9,7 +9,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
     authDomain: "pchat-cd031.firebaseapp.com",
     projectId: "pchat-cd031",
-    storageBucket: "pchat-cd031.firebasestorage.app", // ✅ FIXED STORAGE BUCKET
+    storageBucket: "pchat-cd031.appspot.com", // ✅ FIXED STORAGE BUCKET
     messagingSenderId: "943721700844",
     appId: "1:943721700844:web:eaafc6214592a5260834c9",
     measurementId: "G-HJSX8FGMTB"
