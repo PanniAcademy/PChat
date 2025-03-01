@@ -50,20 +50,23 @@ async function sendMessage(contactEmail) {
         let chatID = generateChatID(user.email, contactEmail);
         let chatRef = window.firestore.doc(window.db, "chats", chatID);
 
-        await window.firestore.setDoc(chatRef, { messages: [] }, { merge: true });
-        await window.firestore.updateDoc(chatRef, { 
-            messages: window.firestore.arrayUnion({
-                sender: user.email,
-                text: message,
-                timestamp: Date.now()
-            })
+        let docSnap = await window.firestore.getDoc(chatRef);
+        let chatData = docSnap.exists() ? docSnap.data() : { messages: [] };
+
+        chatData.messages.push({ 
+            sender: user.email, 
+            text: message, 
+            timestamp: Date.now() 
         });
+
+        await window.firestore.setDoc(chatRef, chatData);
 
         document.getElementById("messageInput").value = "";
     } catch (error) {
         alert("❌ Error sending message: " + error.message);
     }
 }
+
 
 function loadChat(contactEmail) {
     let user = window.auth.currentUser;
