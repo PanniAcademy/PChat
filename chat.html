@@ -32,39 +32,49 @@
             });
         });
 
-        async function sendMessage(contactEmail) {
-            let message = document.getElementById("messageInput").value.trim();
-            if (!message) {
-                alert("❌ Enter a message!");
-                return;
-            }
+import { db, doc, setDoc, updateDoc, arrayUnion } from './firebase.js';
 
-            let user = window.auth.currentUser;
-            if (!user) {
-                alert("❌ No user logged in! Redirecting...");
-                window.location.href = "login.html";
-                return;
-            }
+async function sendMessage(contactEmail) {
+    let message = document.getElementById("messageInput").value.trim();
+    if (!message) {
+        alert("❌ Enter a message!");
+        return;
+    }
 
-            try {
-                let chatID = generateChatID(user.email, contactEmail);
-                let chatRef = window.firestore.doc(window.db, "chats", chatID);
+    let user = window.auth.currentUser;
+    if (!user) {
+        alert("❌ No user logged in! Redirecting...");
+        window.location.href = "login.html";
+        return;
+    }
 
-                await window.firestore.setDoc(chatRef, { messages: [] }, { merge: true });
-                await window.firestore.updateDoc(chatRef, { 
-                    messages: window.firestore.arrayUnion({
-                        sender: user.email,
-                        text: message,
-                        timestamp: Date.now()
-                    })
-                });
+    try {
+        let chatID = generateChatID(user.email, contactEmail);
+        let chatRef = doc(db, "chats", chatID);
 
-                document.getElementById("messageInput").value = "";
-                loadChat(contactEmail);
-            } catch (error) {
-                alert("❌ Error sending message: " + error.message);
-            }
+        // ✅ Ensure the chat document exists
+        let chatDoc = await getDoc(chatRef);
+        if (!chatDoc.exists()) {
+            await setDoc(chatRef, { messages: [] });
         }
+
+        // ✅ Add message to Firestore
+        await updateDoc(chatRef, { 
+            messages: arrayUnion({
+                sender: user.email,
+                text: message,
+                timestamp: Date.now()
+            })
+        });
+
+        // ✅ Clear input field after sending
+        document.getElementById("messageInput").value = "";
+
+    } catch (error) {
+        alert("❌ Error sending message: " + error.message);
+    }
+}
+
 
 import { db, doc, onSnapshot, getDoc, setDoc, updateDoc, arrayUnion } from './firebase.js';
 
