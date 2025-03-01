@@ -10,30 +10,43 @@
     <h2>Login to PChat</h2>
     <input type="email" id="email" placeholder="Enter email">
     <input type="password" id="password" placeholder="Enter password">
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Sign Up</button>
+    <button id="loginBtn">Login</button>
+    <button id="signupBtn">Sign Up</button>
 
     <script type="module">
         import { auth } from './firebase.js';
         import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js';
 
-        function login() {
+        document.getElementById("loginBtn").addEventListener("click", () => {
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             
             signInWithEmailAndPassword(auth, email, password)
-                .then(() => window.location.href = "contacts.html")
-                .catch(error => alert(error.message));
-        }
+                .then(() => {
+                    alert("Login successful!");
+                    window.location.href = "contacts.html";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
 
-        function signup() {
+        document.getElementById("signupBtn").addEventListener("click", () => {
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
             
             createUserWithEmailAndPassword(auth, email, password)
-                .then(() => window.location.href = "contacts.html")
-                .catch(error => alert(error.message));
-        }
+                .then(() => {
+                    alert("Signup successful!");
+                    window.location.href = "contacts.html";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
