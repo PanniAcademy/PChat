@@ -10,14 +10,47 @@
     <h2>Login to PChat</h2>
     <input type="email" id="email" placeholder="Enter email">
     <input type="password" id="password" placeholder="Enter password">
-    <button id="testBtn">Click Me</button>
+    <button id="loginBtn">Login</button>
+    <button id="signupBtn">Sign Up</button>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            alert("✅ JavaScript is working!");
+    <script type="module">
+        import { auth } from './firebase.js';
+        import { 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword 
+        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-            document.getElementById("testBtn").addEventListener("click", function() {
-                alert("✅ Button Clicked!");
+        document.addEventListener("DOMContentLoaded", () => {
+            alert("✅ JavaScript is running! Now setting up Firebase...");
+
+            document.getElementById("loginBtn").addEventListener("click", async () => {
+                let email = document.getElementById("email").value;
+                let password = document.getElementById("password").value;
+
+                alert("🔵 Login button clicked");
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert("✅ Login successful!");
+                    window.location.href = "contacts.html";
+                } catch (error) {
+                    alert("❌ Error: " + error.message);
+                }
+            });
+
+            document.getElementById("signupBtn").addEventListener("click", async () => {
+                let email = document.getElementById("email").value;
+                let password = document.getElementById("password").value;
+
+                alert("🟢 Signup button clicked");
+
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    alert("✅ Signup successful!");
+                    window.location.href = "contacts.html";
+                } catch (error) {
+                    alert("❌ Error: " + error.message);
+                }
             });
         });
     </script>
