@@ -66,16 +66,18 @@
             }
         }
 
-function loadChat(contactEmail) {
+import { db, doc, onSnapshot, getDoc, setDoc, updateDoc, arrayUnion } from './firebase.js';
+
+async function loadChat(contactEmail) {
     let user = window.auth.currentUser;
     if (!user) return;
 
     let chatID = generateChatID(user.email, contactEmail);
-    let chatRef = window.firestore.doc(window.db, "chats", chatID);
+    let chatRef = doc(db, "chats", chatID);
     let chatBox = document.getElementById("chatBox");
 
     // ✅ Listen for real-time message updates
-    window.firestore.onSnapshot(chatRef, (docSnap) => {
+    onSnapshot(chatRef, (docSnap) => {
         chatBox.innerHTML = ""; // Clear old messages
         if (docSnap.exists()) {
             let messages = docSnap.data().messages || [];
@@ -89,6 +91,7 @@ function loadChat(contactEmail) {
         alert("❌ Error loading messages: " + error.message);
     });
 }
+
 
 
         function generateChatID(email1, email2) {
