@@ -10,41 +10,14 @@
     <h2>Login to PChat</h2>
     <input type="email" id="email" placeholder="Enter email">
     <input type="password" id="password" placeholder="Enter password">
-    <button id="loginBtn">Login</button>
-    <button id="signupBtn">Sign Up</button>
+    <button id="testBtn">Click Me</button>
 
-    <script type="module">
-        import { auth } from './firebase.js';
-        import { 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword 
-        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            alert("✅ JavaScript is working!");
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("loginBtn").addEventListener("click", async () => {
-                let email = document.getElementById("email").value;
-                let password = document.getElementById("password").value;
-
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    alert("Login successful!");
-                    window.location.href = "contacts.html";
-                } catch (error) {
-                    alert(error.message);
-                }
-            });
-
-            document.getElementById("signupBtn").addEventListener("click", async () => {
-                let email = document.getElementById("email").value;
-                let password = document.getElementById("password").value;
-
-                try {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    alert("Signup successful!");
-                    window.location.href = "contacts.html";
-                } catch (error) {
-                    alert(error.message);
-                }
+            document.getElementById("testBtn").addEventListener("click", function() {
+                alert("✅ Button Clicked!");
             });
         });
     </script>
