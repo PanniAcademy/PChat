@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PChat</title>
-    <link rel="stylesheet" href="login.css">
-    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js before using it -->
+    <link rel="stylesheet" href="style.css">
+    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js -->
 </head>
 <body>
     <h2>Login to PChat</h2>
@@ -16,16 +16,12 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            //alert("✅ JavaScript is running! Now setting up Firebase...");
-
             document.getElementById("loginBtn").addEventListener("click", async function () {
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
-                //alert("🔵 Login button clicked");
-
                 try {
-                    await window.signInWithEmailAndPassword(window.auth, email, password);
+                    await window.authFunctions.signInWithEmailAndPassword(window.auth, email, password);
                     alert("✅ Login successful!");
                     window.location.href = "contacts.html";
                 } catch (error) {
@@ -37,10 +33,8 @@
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
-                //alert("🟢 Signup button clicked");
-
                 try {
-                    await window.createUserWithEmailAndPassword(window.auth, email, password);
+                    await window.authFunctions.createUserWithEmailAndPassword(window.auth, email, password);
                     alert("✅ Signup successful!");
                     window.location.href = "contacts.html";
                 } catch (error) {
