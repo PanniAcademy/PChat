@@ -1,6 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { 
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { 
+    getFirestore, collection, doc, getDoc, setDoc, updateDoc, arrayUnion
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -18,12 +22,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ✅ Store Firebase objects globally for both login and contacts pages
+// ✅ Store Firebase objects globally
 window.auth = auth;
 window.db = db;
 
-// ✅ Store Auth functions in `window.authFunctions`
+// ✅ Store Auth functions
 window.authFunctions = { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged };
 
-// ✅ Store Firestore functions in `window.firestore`
-window.firestore = { collection, doc, getDoc, setDoc };
+// ✅ Store Firestore functions
+window.firestore = { collection, doc, getDoc, setDoc, updateDoc, arrayUnion };
