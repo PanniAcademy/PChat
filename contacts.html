@@ -56,27 +56,32 @@
             }
         }
 
-        async function loadContacts(user) {
-            let contactList = document.getElementById("contactList");
-            contactList.innerHTML = "";
+async function loadContacts(user) {
+    let contactList = document.getElementById("contactList");
+    contactList.innerHTML = "";
 
-            try {
-                let userId = user.uid;
-                let contactRef = window.firestore.doc(window.db, "contacts", userId);
-                let docSnap = await window.firestore.getDoc(contactRef);
+    try {
+        let userId = user.uid;
+        let contactRef = window.firestore.doc(window.db, "contacts", userId);
+        let docSnap = await window.firestore.getDoc(contactRef);
 
-                if (docSnap.exists()) {
-                    let contacts = docSnap.data().contacts || [];
-                    contacts.forEach(email => {
-                        let li = document.createElement("li");
-                        li.textContent = email;
-                        contactList.appendChild(li);
-                    });
-                }
-            } catch (error) {
-                alert("❌ Error loading contacts: " + error.message);
-            }
+        if (docSnap.exists()) {
+            let contacts = docSnap.data().contacts || [];
+            contacts.forEach(email => {
+                let li = document.createElement("li");
+                li.textContent = email;
+                li.style.cursor = "pointer"; // Make it look clickable
+                li.addEventListener("click", function () {
+                    window.location.href = `chat.html?contact=${encodeURIComponent(email)}`;
+                });
+                contactList.appendChild(li);
+            });
         }
+    } catch (error) {
+        alert("❌ Error loading contacts: " + error.message);
+    }
+}
+
     </script>
 </body>
 </html>
