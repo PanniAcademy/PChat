@@ -4,6 +4,39 @@ body {
     color: white;
     text-align: center;
 }
+#chatBox {
+    width: 90%;
+    max-width: 500px;
+    height: 300px;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #222; /* Dark theme */
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.sent {
+    align-self: flex-end;
+    background-color: #007bff;
+    color: white;
+}
+
+.received {
+    align-self: flex-start;
+    background-color: #444;
+    color: white;
+}
 
 #chatContainer {
     width: 90%;
