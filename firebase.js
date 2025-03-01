@@ -10,7 +10,8 @@ const firebaseConfig = {
     projectId: "pchat-cd031",
     storageBucket: "pchat-cd031.appspot.com", // ✅ FIXED STORAGE BUCKET
     messagingSenderId: "943721700844",
-    appId: "1:943721700844:web:eaafc6214592a5260834c9"
+    appId: "1:943721700844:web:eaafc6214592a5260834c9",
+    measurementId: "G-HJSX8FGMTB"
 };
 
 // Initialize Firebase
