@@ -36,7 +36,7 @@
         });
 
         async function addContact(user) {
-            let contactEmail = document.getElementById("contactEmail").value;
+            let contactEmail = document.getElementById("contactEmail").value.trim();
             if (!contactEmail) {
                 alert("❌ Enter a contact email!");
                 return;
@@ -46,9 +46,8 @@
                 let userId = user.uid;
                 let contactRef = window.firestore.doc(window.db, "contacts", userId);
 
-                await window.firestore.setDoc(contactRef, {
-                    contacts: window.firebase.firestore.FieldValue.arrayUnion(contactEmail)
-                }, { merge: true });
+                await window.firestore.setDoc(contactRef, { contacts: [] }, { merge: true }); // ✅ Ensure contacts array exists
+                await window.firestore.updateDoc(contactRef, { contacts: window.firestore.arrayUnion(contactEmail) });
 
                 alert("✅ Contact added!");
                 loadContacts(user);
@@ -64,10 +63,10 @@
             try {
                 let userId = user.uid;
                 let contactRef = window.firestore.doc(window.db, "contacts", userId);
-                let doc = await window.firestore.getDoc(contactRef);
+                let docSnap = await window.firestore.getDoc(contactRef);
 
-                if (doc.exists()) {
-                    let contacts = doc.data().contacts || [];
+                if (docSnap.exists()) {
+                    let contacts = docSnap.data().contacts || [];
                     contacts.forEach(email => {
                         let li = document.createElement("li");
                         li.textContent = email;
