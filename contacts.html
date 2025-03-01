@@ -20,16 +20,16 @@
             alert("✅ Contacts page loaded!");
 
             // ✅ Wait for Firebase to load the user correctly
-            window.auth.onAuthStateChanged((user) => {
+            window.auth.onAuthStateChanged(async (user) => {
                 if (!user) {
-                    //alert("❌ No user logged in! Redirecting to login...");
+                    alert("❌ No user logged in! Redirecting to login...");
                     window.location.href = "login.html";
                     return;
                 }
 
                 alert("✅ User detected: " + user.email);
                 loadContacts(user);
-                
+
                 document.getElementById("addContactBtn").addEventListener("click", function () {
                     addContact(user);
                 });
@@ -38,7 +38,6 @@
 
         async function addContact(user) {
             let contactEmail = document.getElementById("contactEmail").value;
-
             if (!contactEmail) {
                 alert("❌ Enter a contact email!");
                 return;
@@ -46,9 +45,9 @@
 
             try {
                 let userId = user.uid;
-                let contactRef = window.db.collection("contacts").doc(userId);
+                let contactRef = window.firestore.doc(window.db, "contacts", userId);
 
-                await contactRef.set({
+                await window.firestore.setDoc(contactRef, {
                     contacts: window.firebase.firestore.FieldValue.arrayUnion(contactEmail)
                 }, { merge: true });
 
@@ -65,10 +64,10 @@
 
             try {
                 let userId = user.uid;
-                let contactRef = window.db.collection("contacts").doc(userId);
-                let doc = await contactRef.get();
+                let contactRef = window.firestore.doc(window.db, "contacts", userId);
+                let doc = await window.firestore.getDoc(contactRef);
 
-                if (doc.exists) {
+                if (doc.exists()) {
                     let contacts = doc.data().contacts || [];
                     contacts.forEach(email => {
                         let li = document.createElement("li");
