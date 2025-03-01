@@ -14,23 +14,25 @@
     <button id="sendBtn">Send</button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let params = new URLSearchParams(window.location.search);
-            let contactEmail = params.get("contact");
+document.addEventListener("DOMContentLoaded", function () {
+    let params = new URLSearchParams(window.location.search);
+    let contactEmail = params.get("contact");
 
-            if (!contactEmail) {
-                alert("❌ No contact selected! Redirecting...");
-                window.location.href = "contacts.html";
-                return;
-            }
+    if (!contactEmail) {
+        alert("❌ No contact selected! Redirecting...");
+        window.location.href = "contacts.html";
+        return;
+    }
 
-            document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
-            loadChat(contactEmail);
+    document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
+    loadChat(contactEmail);
 
-            document.getElementById("sendBtn").addEventListener("click", function () {
-                sendMessage(contactEmail);
-            });
-        });
+    // ✅ Ensure sendMessage runs when button is clicked
+    document.getElementById("sendBtn").addEventListener("click", function () {
+        sendMessage(contactEmail);
+    });
+});
+
 
 import { db, doc, setDoc, updateDoc, arrayUnion } from './firebase.js';
 
