@@ -4,47 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - PChat</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat.css">
+    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase -->
 </head>
 <body>
-    <h2>Chat</h2>
-    <div id="messages"></div>
+    <h2 id="chatWith">Chat with: </h2>
+    <div id="chatBox"></div>
     <input type="text" id="messageInput" placeholder="Type a message">
-    <button onclick="sendMessage()">Send</button>
+    <button id="sendBtn">Send</button>
 
-    <script type="module">
-        import { db, auth } from './firebase.js';
-        import { collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let params = new URLSearchParams(window.location.search);
+            let contactEmail = params.get("contact");
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const contact = urlParams.get('contact');
+            if (!contactEmail) {
+                alert("❌ No contact selected! Redirecting...");
+                window.location.href = "contacts.html";
+                return;
+            }
 
-        async function sendMessage() {
-            let message = document.getElementById("messageInput").value;
-            await addDoc(collection(db, "messages"), {
-                sender: auth.currentUser.email,
-                receiver: contact,
-                text: message,
-                timestamp: new Date()
+            document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
+            loadChat(contactEmail);
+
+            document.getElementById("sendBtn").addEventListener("click", function () {
+                sendMessage(contactEmail);
             });
-            loadMessages();
+        });
+
+        async function sendMessage(contactEmail) {
+            let message = document.getElementById("messageInput").value.trim();
+            if (!message) {
+                alert("❌ Enter a message!");
+                return;
+            }
+
+            let user = window.auth.currentUser;
+            if (!user) {
+                alert("❌ No user logged in! Redirecting...");
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                let chatID = generateChatID(user.email, contactEmail);
+                let chatRef = window.firestore.doc(window.db, "chats", chatID);
+
+                await window.firestore.setDoc(chatRef, { messages: [] }, { merge: true });
+                await window.firestore.updateDoc(chatRef, { 
+                    messages: window.firestore.arrayUnion({
+                        sender: user.email,
+                        text: message,
+                        timestamp: Date.now()
+                    })
+                });
+
+                document.getElementById("messageInput").value = "";
+                loadChat(contactEmail);
+            } catch (error) {
+                alert("❌ Error sending message: " + error.message);
+            }
         }
 
-        async function loadMessages() {
-            let messagesDiv = document.getElementById("messages");
-            messagesDiv.innerHTML = "";
-            let querySnapshot = await getDocs(collection(db, "messages"));
-            querySnapshot.forEach(doc => {
-                let data = doc.data();
-                if ((data.sender === auth.currentUser.email && data.receiver === contact) ||
-                    (data.sender === contact && data.receiver === auth.currentUser.email)) {
-                    let p = document.createElement("p");
-                    p.innerText = `${data.sender}: ${data.text}`;
-                    messagesDiv.appendChild(p);
+        async function loadChat(contactEmail) {
+            let user = window.auth.currentUser;
+            if (!user) return;
+
+            let chatID = generateChatID(user.email, contactEmail);
+            let chatRef = window.firestore.doc(window.db, "chats", chatID);
+            let chatBox = document.getElementById("chatBox");
+
+            try {
+                let docSnap = await window.firestore.getDoc(chatRef);
+
+                chatBox.innerHTML = ""; // Clear old messages
+                if (docSnap.exists()) {
+                    let messages = docSnap.data().messages || [];
+                    messages.forEach(msg => {
+                        let div = document.createElement("div");
+                        div.textContent = `${msg.sender}: ${msg.text}`;
+                        chatBox.appendChild(div);
+                    });
                 }
-            });
+            } catch (error) {
+                alert("❌ Error loading messages: " + error.message);
+            }
         }
-        loadMessages();
+
+        function generateChatID(email1, email2) {
+            return [email1, email2].sort().join("_");
+        }
     </script>
 </body>
 </html>
