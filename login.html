@@ -16,13 +16,13 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            alert("✅ JavaScript is running! Now setting up Firebase...");
+            //alert("✅ JavaScript is running! Now setting up Firebase...");
 
             document.getElementById("loginBtn").addEventListener("click", async function () {
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
-                alert("🔵 Login button clicked");
+                //alert("🔵 Login button clicked");
 
                 try {
                     await window.signInWithEmailAndPassword(window.auth, email, password);
@@ -37,7 +37,7 @@
                 let email = document.getElementById("email").value;
                 let password = document.getElementById("password").value;
 
-                alert("🟢 Signup button clicked");
+                //alert("🟢 Signup button clicked");
 
                 try {
                     await window.createUserWithEmailAndPassword(window.auth, email, password);
