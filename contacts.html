@@ -12,7 +12,7 @@
     <ul id="contactList"></ul>
 
     <script type="module">
-        import { auth, db, collection, addDoc, getDocs, query, where } from './firebase.js';
+        import { auth, db, collection, addDoc, getDocs, query, where, onAuthStateChanged } from './firebase.js';
 
         document.getElementById('addContactBtn').addEventListener("click", addContact);
 
@@ -23,10 +23,9 @@
                 return;
             }
 
-            alert("Checking if user exists..."); // Debugging alert
+            alert("Checking if user exists...");
 
             try {
-                // Check if the user exists in Firestore
                 let usersRef = collection(db, "users");
                 let q = query(usersRef, where("email", "==", email));
                 let querySnapshot = await getDocs(q);
@@ -36,9 +35,19 @@
                     return;
                 }
 
-                alert("User found! Adding to contacts..."); // Debugging alert
+                alert("User found! Checking if contact already exists...");
 
-                // Save the contact
+                // 🛠️ FIX: Check if the contact is already added
+                let contactsRef = collection(db, "contacts");
+                let existingQuery = query(contactsRef, where("userEmail", "==", auth.currentUser.email), where("contactEmail", "==", email));
+                let existingSnapshot = await getDocs(existingQuery);
+
+                if (!existingSnapshot.empty) {
+                    alert("This contact is already added.");
+                    return;
+                }
+
+                // Add contact if it's new
                 await addDoc(collection(db, "contacts"), { userEmail: auth.currentUser.email, contactEmail: email });
 
                 alert("Contact added successfully!");
@@ -49,7 +58,7 @@
         }
 
         async function loadContacts() {
-            alert("Loading contacts..."); // Debugging alert
+            alert("Loading contacts...");
             let contactsRef = collection(db, "contacts");
             let q = query(contactsRef, where("userEmail", "==", auth.currentUser.email));
             let querySnapshot = await getDocs(q);
@@ -70,17 +79,15 @@
             location.href = "chat.html";
         }
 
-import { onAuthStateChanged } from './firebase.js';
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        loadContacts();
-    } else {
-        alert("User not logged in. Redirecting to login page.");
-        location.href = "login.html";
-    }
-});
-
+        // ✅ FIX: Ensure the user is logged in before loading contacts
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadContacts();
+            } else {
+                alert("User not logged in. Redirecting to login page.");
+                location.href = "login.html";
+            }
+        });
     </script>
 </body>
 </html>
