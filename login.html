@@ -40,12 +40,12 @@ async function register() {
     try {
         let userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // 🛠️ FIX: Save user to Firestore when they register
+        // 🛠️ FIX: Save user email to Firestore (inside "users" collection)
         await addDoc(collection(db, "users"), { email });
 
         alert("Registration successful! Please log in.");
     } catch (error) {
-        alert("Registration Error: " + error.message);
+        alert("Error: " + error.message);
     }
 }
 
