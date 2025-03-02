@@ -6,13 +6,15 @@
 <body>
     <h1>Your Contacts</h1>
     <input type="email" id="contactEmail" placeholder="Enter Contact's Email">
-    <button onclick="addContact()">Add Contact</button>
+    <button id="addContactBtn">Add Contact</button>
 
     <h2>Saved Contacts</h2>
     <ul id="contactList"></ul>
 
     <script type="module">
         import { auth, db, collection, addDoc, getDocs, query, where } from './firebase.js';
+
+        document.getElementById('addContactBtn').addEventListener("click", addContact);
 
         async function addContact() {
             let email = document.getElementById('contactEmail').value;
@@ -21,8 +23,10 @@
                 return;
             }
 
+            alert("Checking if user exists..."); // Debugging alert
+
             try {
-                // Check if the user exists in Firestore (only allow registered users)
+                // Check if the user exists in Firestore
                 let usersRef = collection(db, "users");
                 let q = query(usersRef, where("email", "==", email));
                 let querySnapshot = await getDocs(q);
@@ -32,16 +36,20 @@
                     return;
                 }
 
+                alert("User found! Adding to contacts..."); // Debugging alert
+
                 // Save the contact
                 await addDoc(collection(db, "contacts"), { userEmail: auth.currentUser.email, contactEmail: email });
-                alert("Contact added!");
+
+                alert("Contact added successfully!");
                 location.reload();
             } catch (error) {
-                alert(error.message);
+                alert("Error: " + error.message);
             }
         }
 
         async function loadContacts() {
+            alert("Loading contacts..."); // Debugging alert
             let contactsRef = collection(db, "contacts");
             let q = query(contactsRef, where("userEmail", "==", auth.currentUser.email));
             let querySnapshot = await getDocs(q);
