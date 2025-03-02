@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - PChat</title>
     <link rel="stylesheet" href="chat.css">
-    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase -->
+    <script defer src="firebase.js" type="module"></script>
 </head>
 <body>
     <h2 id="chatWith">Chat with: </h2>
@@ -16,28 +16,40 @@
 <script type="module">
 document.addEventListener("DOMContentLoaded", function () {
     let params = new URLSearchParams(window.location.search);
-    let contactEmail = params.get("contact");
+    let contactUid = params.get("contactUid"); // Get contact UID
 
-    if (!contactEmail) {
+    if (!contactUid) {
         alert("❌ No contact selected! Redirecting...");
         window.location.href = "contacts.html";
         return;
     }
 
-    document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
-    loadChat(contactEmail);
+    // Get contact email from uid
+    getContactEmail(contactUid).then(contactEmail => {
+        document.getElementById("chatWith").textContent = "Chat with: " + contactEmail;
+        loadChat(contactUid);
+    });
 
     document.getElementById("sendBtn").addEventListener("click", function () {
-        sendMessage(contactEmail);
+        sendMessage(contactUid);
     });
 });
 
-// ✅ Fix: Generate consistent chat ID
-function generateChatID(email1, email2) {
-    return [email1, email2].sort().join("_"); // Unique chat ID for both users
+async function getContactEmail(contactUid) {
+    let contactRef = window.firestore.doc(window.db, "contacts", contactUid);
+    let docSnap = await window.firestore.getDoc(contactRef);
+    if (docSnap.exists()) {
+        return docSnap.data().email;
+    } else {
+        return "Unknown";
+    }
 }
 
-async function sendMessage(contactEmail) {
+function generateChatID(uid1, uid2) {
+    return [uid1, uid2].sort().join("_");
+}
+
+async function sendMessage(contactUid) {
     let message = document.getElementById("messageInput").value.trim();
     if (!message) {
         alert("❌ Enter a message!");
@@ -52,51 +64,48 @@ async function sendMessage(contactEmail) {
     }
 
     try {
-        let chatID = generateChatID(user.email, contactEmail);
+        let chatID = generateChatID(user.uid, contactUid);
         let chatRef = window.firestore.doc(window.db, "chats", chatID);
 
-        // ✅ Fix: Ensure chat exists before updating
         let docSnap = await window.firestore.getDoc(chatRef);
         if (!docSnap.exists()) {
-            await window.firestore.setDoc(chatRef, { messages: [] });
+            await window.firestore.setDoc(chatRef, { messages: [], user1Uid: user.uid, user2Uid: contactUid });
         }
 
         await window.firestore.updateDoc(chatRef, {
             messages: window.firestore.arrayUnion({
-                sender: user.email,
+                senderUid: user.uid,
                 text: message,
                 timestamp: Date.now()
             })
         });
 
-        document.getElementById("messageInput").value = ""; // ✅ Clear input after sending
+        document.getElementById("messageInput").value = "";
     } catch (error) {
         alert("❌ Error sending message: " + error.message);
     }
 }
 
-// ✅ Fix: Load Messages in Real Time for Both Users
-function loadChat(contactEmail) {
+function loadChat(contactUid) {
     let user = window.auth.currentUser;
     if (!user) return;
 
-    let chatID = generateChatID(user.email, contactEmail);
+    let chatID = generateChatID(user.uid, contactUid);
     let chatRef = window.firestore.doc(window.db, "chats", chatID);
     let chatBox = document.getElementById("chatBox");
 
     window.firestore.onSnapshot(chatRef, (docSnap) => {
-        chatBox.innerHTML = ""; // Clear old messages
+        chatBox.innerHTML = "";
 
         if (docSnap.exists()) {
             let messages = docSnap.data().messages || [];
 
             messages.forEach(msg => {
                 let div = document.createElement("div");
-                div.textContent = `${msg.sender}: ${msg.text}`;
+                div.textContent = `${msg.senderUid === user.uid ? "You" : contactUid}: ${msg.text}`;
                 div.classList.add("message");
 
-                // ✅ Style messages based on sender
-                if (msg.sender === user.email) {
+                if (msg.senderUid === user.uid) {
                     div.classList.add("sent");
                 } else {
                     div.classList.add("received");
@@ -105,7 +114,6 @@ function loadChat(contactEmail) {
                 chatBox.appendChild(div);
             });
 
-            // ✅ Auto-scroll to the latest message
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     }, (error) => {
@@ -113,6 +121,5 @@ function loadChat(contactEmail) {
     });
 }
 </script>
-
 </body>
 </html>
