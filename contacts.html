@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacts - PChat</title>
     <link rel="stylesheet" href="contacts.css">
-    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js -->
+    <script defer src="firebase.js" type="module"></script>
 </head>
 <body>
     <h2>Your Contacts</h2>
@@ -14,9 +14,8 @@
     
     <h3>Contact List:</h3>
     <ul id="contactList"></ul>
-<script type="module" src="firebase.js"></script>
 
-    <script>
+    <script type="module">
         document.addEventListener("DOMContentLoaded", function () {
             alert("✅ Contacts page loaded!");
 
@@ -47,7 +46,7 @@
                 let userId = user.uid;
                 let contactRef = window.firestore.doc(window.db, "contacts", userId);
 
-                await window.firestore.setDoc(contactRef, { contacts: [] }, { merge: true }); // ✅ Ensure contacts array exists
+                await window.firestore.setDoc(contactRef, { contacts: [] }, { merge: true });
                 await window.firestore.updateDoc(contactRef, { contacts: window.firestore.arrayUnion(contactEmail) });
 
                 alert("✅ Contact added!");
@@ -71,15 +70,39 @@ async function loadContacts(user) {
             contacts.forEach(email => {
                 let li = document.createElement("li");
                 li.textContent = email;
-                li.style.cursor = "pointer"; // Make it look clickable
-                li.addEventListener("click", function () {
-                    window.location.href = `chat.html?contact=${encodeURIComponent(email)}`;
+                li.style.cursor = "pointer";
+                li.addEventListener("click", async function () {
+                    try {
+                        let contactUid = await getContactUid(email);
+                        if (contactUid) {
+                            window.location.href = `chat.html?contactUid=${encodeURIComponent(contactUid)}`;
+                        } else {
+                            alert("❌ Contact UID not found.");
+                        }
+                    } catch (error) {
+                        alert("❌ Error: " + error.message);
+                    }
                 });
                 contactList.appendChild(li);
             });
         }
     } catch (error) {
         alert("❌ Error loading contacts: " + error.message);
+    }
+}
+
+async function getContactUid(email) {
+    try {
+        const querySnapshot = await window.firestore.collection(window.db, "contacts").where("email", "==", email).get();
+
+        if (!querySnapshot.empty) {
+            return querySnapshot.docs[0].id;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error getting contact UID:", error);
+        return null;
     }
 }
 
