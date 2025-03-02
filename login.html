@@ -7,32 +7,39 @@
     <h1>Login</h1>
     <input type="email" id="email" placeholder="Enter email">
     <input type="password" id="password" placeholder="Enter password">
-    <button onclick="login()">Login</button>
-    <button onclick="register()">Register</button>
+    <button id="loginBtn">Login</button>
+    <button id="registerBtn">Register</button>
 
     <script type="module">
         import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from './firebase.js';
 
+        document.getElementById('loginBtn').addEventListener("click", login);
+        document.getElementById('registerBtn').addEventListener("click", register);
+
         async function login() {
             let email = document.getElementById('email').value;
             let password = document.getElementById('password').value;
+            alert("Logging in..."); // Debugging alert
+
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 alert("Login successful!");
                 location.href = 'contacts.html';
             } catch (error) {
-                alert(error.message);
+                alert("Login Error: " + error.message);
             }
         }
 
         async function register() {
             let email = document.getElementById('email').value;
             let password = document.getElementById('password').value;
+            alert("Registering..."); // Debugging alert
+
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 alert("Registration successful! Please log in.");
             } catch (error) {
-                alert(error.message);
+                alert("Registration Error: " + error.message);
             }
         }
     </script>
