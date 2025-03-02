@@ -1,48 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - PChat</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="firebase.js" type="module"></script> <!-- ✅ Load Firebase.js -->
+    <title>PChat - Login</title>
 </head>
 <body>
-    <h2>Login to PChat</h2>
+    <h1>Login</h1>
     <input type="email" id="email" placeholder="Enter email">
     <input type="password" id="password" placeholder="Enter password">
-    <button id="loginBtn">Login</button>
-    <button id="signupBtn">Sign Up</button>
-<script type="module" src="firebase.js"></script>
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("loginBtn").addEventListener("click", async function () {
-                let email = document.getElementById("email").value;
-                let password = document.getElementById("password").value;
+    <script type="module">
+        import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from './firebase.js';
 
-                try {
-                    await window.authFunctions.signInWithEmailAndPassword(window.auth, email, password);
-                    alert("✅ Login successful!");
-                    window.location.href = "contacts.html";
-                } catch (error) {
-                    alert("❌ Error: " + error.message);
-                }
-            });
+        async function login() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert("Login successful!");
+                location.href = 'contacts.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
 
-            document.getElementById("signupBtn").addEventListener("click", async function () {
-                let email = document.getElementById("email").value;
-                let password = document.getElementById("password").value;
-
-                try {
-                    await window.authFunctions.createUserWithEmailAndPassword(window.auth, email, password);
-                    alert("✅ Signup successful!");
-                    window.location.href = "contacts.html";
-                } catch (error) {
-                    alert("❌ Error: " + error.message);
-                }
-            });
-        });
+        async function register() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert("Registration successful! Please log in.");
+            } catch (error) {
+                alert(error.message);
+            }
+        }
     </script>
 </body>
 </html>
