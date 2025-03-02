@@ -70,7 +70,17 @@
             location.href = "chat.html";
         }
 
+import { onAuthStateChanged } from './firebase.js';
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
         loadContacts();
+    } else {
+        alert("User not logged in. Redirecting to login page.");
+        location.href = "login.html";
+    }
+});
+
     </script>
 </body>
 </html>
