@@ -30,18 +30,23 @@
             }
         }
 
-        async function register() {
-            let email = document.getElementById('email').value;
-            let password = document.getElementById('password').value;
-            alert("Registering..."); // Debugging alert
+async function register() {
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+    alert("Registering...");
 
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert("Registration successful! Please log in.");
-            } catch (error) {
-                alert("Registration Error: " + error.message);
-            }
-        }
+    try {
+        let userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Save user email in Firestore
+        await addDoc(collection(db, "users"), { email });
+
+        alert("Registration successful! Please log in.");
+    } catch (error) {
+        alert("Registration Error: " + error.message);
+    }
+}
+
     </script>
 </body>
 </html>
