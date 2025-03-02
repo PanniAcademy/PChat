@@ -14,8 +14,6 @@
     <button id="sendBtn">Send</button>
 
 <script type="module">
-import { doc, getDoc, updateDoc, arrayUnion, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
 document.addEventListener("DOMContentLoaded", function () {
     let params = new URLSearchParams(window.location.search);
     let contactEmail = params.get("contact");
@@ -34,9 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// ✅ Generate Unique Chat ID
+// ✅ Fix: Generate consistent chat ID
 function generateChatID(email1, email2) {
-    return [email1, email2].sort().join("_"); // Ensures both users see the same chat
+    return [email1, email2].sort().join("_"); // Unique chat ID for both users
 }
 
 async function sendMessage(contactEmail) {
@@ -55,37 +53,38 @@ async function sendMessage(contactEmail) {
 
     try {
         let chatID = generateChatID(user.email, contactEmail);
-        let chatRef = doc(window.db, "chats", chatID);
-        let docSnap = await getDoc(chatRef);
+        let chatRef = window.firestore.doc(window.db, "chats", chatID);
 
+        // ✅ Fix: Ensure chat exists before updating
+        let docSnap = await window.firestore.getDoc(chatRef);
         if (!docSnap.exists()) {
-            await setDoc(chatRef, { messages: [] }); // ✅ Create empty chat if it doesn't exist
+            await window.firestore.setDoc(chatRef, { messages: [] });
         }
 
-        await updateDoc(chatRef, {
-            messages: arrayUnion({
+        await window.firestore.updateDoc(chatRef, {
+            messages: window.firestore.arrayUnion({
                 sender: user.email,
                 text: message,
                 timestamp: Date.now()
             })
         });
 
-        document.getElementById("messageInput").value = "";
+        document.getElementById("messageInput").value = ""; // ✅ Clear input after sending
     } catch (error) {
         alert("❌ Error sending message: " + error.message);
     }
 }
 
-// ✅ Load Messages for BOTH Users in Real Time
+// ✅ Fix: Load Messages in Real Time for Both Users
 function loadChat(contactEmail) {
     let user = window.auth.currentUser;
     if (!user) return;
 
     let chatID = generateChatID(user.email, contactEmail);
-    let chatRef = doc(window.db, "chats", chatID);
+    let chatRef = window.firestore.doc(window.db, "chats", chatID);
     let chatBox = document.getElementById("chatBox");
 
-    onSnapshot(chatRef, (docSnap) => {
+    window.firestore.onSnapshot(chatRef, (docSnap) => {
         chatBox.innerHTML = ""; // Clear old messages
 
         if (docSnap.exists()) {
