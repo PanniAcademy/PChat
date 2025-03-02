@@ -1,111 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacts - PChat</title>
-    <link rel="stylesheet" href="contacts.css">
-    <script defer src="firebase.js" type="module"></script>
+    <title>PChat - Contacts</title>
 </head>
 <body>
-    <h2>Your Contacts</h2>
-    <input type="text" id="contactEmail" placeholder="Enter contact's email">
-    <button id="addContactBtn">Add Contact</button>
-    
-    <h3>Contact List:</h3>
+    <h1>Your Contacts</h1>
+    <input type="text" id="contactName" placeholder="Enter Name">
+    <input type="text" id="contactNumber" placeholder="Enter Phone Number">
+    <button onclick="addContact()">Add Contact</button>
+
+    <h2>Saved Contacts</h2>
     <ul id="contactList"></ul>
 
     <script type="module">
-        document.addEventListener("DOMContentLoaded", function () {
-            alert("✅ Contacts page loaded!");
+        import { auth, db, collection, addDoc, getDocs } from './firebase.js';
 
-            window.authFunctions.onAuthStateChanged(window.auth, async (user) => {
-                if (!user) {
-                    alert("❌ No user logged in! Redirecting to login...");
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                alert("✅ User detected: " + user.email);
-                loadContacts(user);
-
-                document.getElementById("addContactBtn").addEventListener("click", function () {
-                    addContact(user);
-                });
-            });
-        });
-
-        async function addContact(user) {
-            let contactEmail = document.getElementById("contactEmail").value.trim();
-            if (!contactEmail) {
-                alert("❌ Enter a contact email!");
-                return;
-            }
-
+        async function addContact() {
+            let name = document.getElementById('contactName').value;
+            let number = document.getElementById('contactNumber').value;
             try {
-                let userId = user.uid;
-                let contactRef = window.firestore.doc(window.db, "contacts", userId);
-
-                await window.firestore.setDoc(contactRef, { contacts: [] }, { merge: true });
-                await window.firestore.updateDoc(contactRef, { contacts: window.firestore.arrayUnion(contactEmail) });
-
-                alert("✅ Contact added!");
-                loadContacts(user);
+                await addDoc(collection(db, "contacts"), { name, number });
+                alert("Contact added!");
+                location.reload();
             } catch (error) {
-                alert("❌ Error: " + error.message);
+                alert(error.message);
             }
         }
 
-async function loadContacts(user) {
-    let contactList = document.getElementById("contactList");
-    contactList.innerHTML = "";
-
-    try {
-        let userId = user.uid;
-        let contactRef = window.firestore.doc(window.db, "contacts", userId);
-        let docSnap = await window.firestore.getDoc(contactRef);
-
-        if (docSnap.exists()) {
-            let contacts = docSnap.data().contacts || [];
-            contacts.forEach(email => {
-                let li = document.createElement("li");
-                li.textContent = email;
-                li.style.cursor = "pointer";
-                li.addEventListener("click", async function () {
-                    try {
-                        let contactUid = await getContactUid(email);
-                        if (contactUid) {
-                            window.location.href = `chat.html?contactUid=${encodeURIComponent(contactUid)}`;
-                        } else {
-                            alert("❌ Contact UID not found.");
-                        }
-                    } catch (error) {
-                        alert("❌ Error: " + error.message);
-                    }
-                });
-                contactList.appendChild(li);
+        async function loadContacts() {
+            let contacts = await getDocs(collection(db, "contacts"));
+            let list = document.getElementById('contactList');
+            list.innerHTML = "";
+            contacts.forEach(doc => {
+                let li = document.createElement('li');
+                li.innerHTML = `${doc.data().name} - ${doc.data().number} <button onclick="startChat('${doc.data().number}')">Chat</button>`;
+                list.appendChild(li);
             });
         }
-    } catch (error) {
-        alert("❌ Error loading contacts: " + error.message);
-    }
-}
 
-async function getContactUid(email) {
-    try {
-        const querySnapshot = await window.firestore.collection(window.db, "contacts").where("email", "==", email).get();
-
-        if (!querySnapshot.empty) {
-            return querySnapshot.docs[0].id;
-        } else {
-            return null;
+        function startChat(number) {
+            localStorage.setItem("chatUser", number);
+            location.href = "chat.html";
         }
-    } catch (error) {
-        console.error("Error getting contact UID:", error);
-        return null;
-    }
-}
 
+        loadContacts();
     </script>
 </body>
 </html>
