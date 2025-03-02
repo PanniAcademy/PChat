@@ -11,6 +11,8 @@
     <button id="registerBtn">Register</button>
 
     <script type="module">
+        import { auth, db, collection, addDoc } from './firebase.js';
+
         import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from './firebase.js';
 
         document.getElementById('loginBtn').addEventListener("click", login);
