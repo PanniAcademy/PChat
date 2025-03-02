@@ -9,7 +9,6 @@ import {
 
 // ✅ Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC33nFhCk6kr9nTJKZjCf_Ux-8j9synxhY",
   authDomain: "pchat-cd031.firebaseapp.com",
   projectId: "pchat-cd031",
   storageBucket: "pchat-cd031.firebasestorage.app",
