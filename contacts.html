@@ -5,21 +5,35 @@
 </head>
 <body>
     <h1>Your Contacts</h1>
-    <input type="text" id="contactName" placeholder="Enter Name">
-    <input type="text" id="contactNumber" placeholder="Enter Phone Number">
+    <input type="email" id="contactEmail" placeholder="Enter Contact's Email">
     <button onclick="addContact()">Add Contact</button>
 
     <h2>Saved Contacts</h2>
     <ul id="contactList"></ul>
 
     <script type="module">
-        import { auth, db, collection, addDoc, getDocs } from './firebase.js';
+        import { auth, db, collection, addDoc, getDocs, query, where } from './firebase.js';
 
         async function addContact() {
-            let name = document.getElementById('contactName').value;
-            let number = document.getElementById('contactNumber').value;
+            let email = document.getElementById('contactEmail').value;
+            if (!email.includes("@")) {
+                alert("Enter a valid email address.");
+                return;
+            }
+
             try {
-                await addDoc(collection(db, "contacts"), { name, number });
+                // Check if the user exists in Firestore (only allow registered users)
+                let usersRef = collection(db, "users");
+                let q = query(usersRef, where("email", "==", email));
+                let querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    alert("This email is not registered on PChat.");
+                    return;
+                }
+
+                // Save the contact
+                await addDoc(collection(db, "contacts"), { userEmail: auth.currentUser.email, contactEmail: email });
                 alert("Contact added!");
                 location.reload();
             } catch (error) {
@@ -28,18 +42,23 @@
         }
 
         async function loadContacts() {
-            let contacts = await getDocs(collection(db, "contacts"));
+            let contactsRef = collection(db, "contacts");
+            let q = query(contactsRef, where("userEmail", "==", auth.currentUser.email));
+            let querySnapshot = await getDocs(q);
+
             let list = document.getElementById('contactList');
             list.innerHTML = "";
-            contacts.forEach(doc => {
+
+            querySnapshot.forEach(doc => {
                 let li = document.createElement('li');
-                li.innerHTML = `${doc.data().name} - ${doc.data().number} <button onclick="startChat('${doc.data().number}')">Chat</button>`;
+                let contactEmail = doc.data().contactEmail;
+                li.innerHTML = `${contactEmail} <button onclick="startChat('${contactEmail}')">Chat</button>`;
                 list.appendChild(li);
             });
         }
 
-        function startChat(number) {
-            localStorage.setItem("chatUser", number);
+        function startChat(email) {
+            localStorage.setItem("chatUser", email);
             location.href = "chat.html";
         }
 
