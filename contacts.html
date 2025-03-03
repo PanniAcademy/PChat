@@ -11,84 +11,96 @@
     <h2>Saved Contacts</h2>
     <ul id="contactList"></ul>
 
-    <script type="module">
-        import { auth, db, collection, addDoc, getDocs, query, where, onAuthStateChanged } from './firebase.js';
+<script type="module">
+    import { auth, db, collection, addDoc, getDocs, query, where, onAuthStateChanged } from './firebase.js';
 
-        function setupEventListeners() {
-            document.getElementById('addContactBtn').addEventListener("click", addContact);
+    alert("Firebase loaded!"); // ✅ Ensure Firebase is working
+
+    let currentUser = null; // 🛠️ Store logged-in user
+
+    document.getElementById('addContactBtn').addEventListener("click", addContact);
+
+    async function addContact() {
+        if (!currentUser) {
+            alert("User not logged in. Please log in again.");
+            return;
         }
 
-        async function addContact() {
-            let email = document.getElementById('contactEmail').value;
-            if (!email.includes("@")) {
-                alert("Enter a valid email address.");
+        let email = document.getElementById('contactEmail').value.trim();
+        if (!email.includes("@")) {
+            alert("Enter a valid email address.");
+            return;
+        }
+
+        alert("Checking if user exists...");
+
+        try {
+            let usersRef = collection(db, "users");
+            let q = query(usersRef, where("email", "==", email));
+            let querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert("This email is not registered on PChat.");
                 return;
             }
 
-            alert("Checking if user exists...");
+            alert("User found! Checking if contact already exists...");
 
-            try {
-                let usersRef = collection(db, "users");
-                let q = query(usersRef, where("email", "==", email));
-                let querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    alert("This email is not registered on PChat.");
-                    return;
-                }
-
-                alert("User found! Checking if contact already exists...");
-
-                let contactsRef = collection(db, "contacts");
-                let existingQuery = query(contactsRef, where("userEmail", "==", auth.currentUser.email), where("contactEmail", "==", email));
-                let existingSnapshot = await getDocs(existingQuery);
-
-                if (!existingSnapshot.empty) {
-                    alert("This contact is already added.");
-                    return;
-                }
-
-                await addDoc(collection(db, "contacts"), { userEmail: auth.currentUser.email, contactEmail: email });
-
-                alert("Contact added successfully!");
-                loadContacts(); // Refresh contacts list
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        }
-
-        async function loadContacts() {
-            alert("Loading contacts...");
+            // 🛠️ FIX: Check if the contact is already added
             let contactsRef = collection(db, "contacts");
-            let q = query(contactsRef, where("userEmail", "==", auth.currentUser.email));
-            let querySnapshot = await getDocs(q);
+            let existingQuery = query(contactsRef, where("userEmail", "==", currentUser.email), where("contactEmail", "==", email));
+            let existingSnapshot = await getDocs(existingQuery);
 
-            let list = document.getElementById('contactList');
-            list.innerHTML = "";
-
-            querySnapshot.forEach(doc => {
-                let li = document.createElement('li');
-                let contactEmail = doc.data().contactEmail;
-                li.innerHTML = `${contactEmail} <button onclick="startChat('${contactEmail}')">Chat</button>`;
-                list.appendChild(li);
-            });
-        }
-
-        function startChat(email) {
-            localStorage.setItem("chatUser", email);
-            location.href = "chat.html";
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                alert("User logged in. Loading contacts...");
-                setupEventListeners(); // 🛠️ Fix: Attach event listeners after auth check
-                loadContacts();
-            } else {
-                alert("User not logged in. Redirecting to login page.");
-                location.href = "login.html";
+            if (!existingSnapshot.empty) {
+                alert("This contact is already added.");
+                return;
             }
+
+            // Add contact if it's new
+            await addDoc(contactsRef, { userEmail: currentUser.email, contactEmail: email });
+
+            alert("Contact added successfully!");
+            loadContacts(); // ✅ Refresh contacts after adding
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    async function loadContacts() {
+        if (!currentUser) return;
+
+        alert("Loading contacts...");
+        let contactsRef = collection(db, "contacts");
+        let q = query(contactsRef, where("userEmail", "==", currentUser.email));
+        let querySnapshot = await getDocs(q);
+
+        let list = document.getElementById('contactList');
+        list.innerHTML = "";
+
+        querySnapshot.forEach(doc => {
+            let li = document.createElement('li');
+            let contactEmail = doc.data().contactEmail;
+            li.innerHTML = `${contactEmail} <button onclick="startChat('${contactEmail}')">Chat</button>`;
+            list.appendChild(li);
         });
-    </script>
+    }
+
+    function startChat(email) {
+        localStorage.setItem("chatUser", email);
+        location.href = "chat.html";
+    }
+
+    // ✅ FIX: Ensure Firebase auth is ready before anything runs
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            loadContacts();
+        } else {
+            alert("User not logged in. Redirecting to login page.");
+            location.href = "login.html";
+        }
+    });
+</script>
+
 </body>
 </html>
