@@ -22,4 +22,5 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 export { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, collection, addDoc, getDocs, query, where };
-alert("Firebase loaded!"); // Debugging alert
+alert("firebase.js loaded correctly!");
+console.log("firebase.js loaded correctly!");
