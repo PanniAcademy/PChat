@@ -10,102 +10,10 @@
 
     <h2>Saved Contacts</h2>
     <ul id="contactList"></ul>
+<script type="module">
+    alert("JavaScript is running!"); // 🔴 If this does not show, your script is not loading at all
+</script>
 
-    <script type="module">
-        import { auth, db, collection, addDoc, getDocs, query, where, onAuthStateChanged } from './firebase.js';
-
-        console.log("Firebase script running..."); // ✅ Debugging step 1
-        alert("Firebase loaded!");
-
-        let currentUser = null;
-
-        // ✅ Ensure the DOM is loaded before adding event listeners
-        document.addEventListener("DOMContentLoaded", () => {
-            console.log("DOM fully loaded."); // ✅ Debugging step 2
-
-            document.getElementById('addContactBtn').addEventListener("click", addContact);
-            
-            // ✅ Check if user is logged in
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log("User detected:", user.email); // ✅ Debugging step 3
-                    currentUser = user;
-                    loadContacts();
-                } else {
-                    alert("User not logged in. Redirecting to login.");
-                    location.href = "login.html";
-                }
-            });
-        });
-
-        async function addContact() {
-            if (!currentUser) {
-                alert("User not logged in. Please log in again.");
-                return;
-            }
-
-            let email = document.getElementById('contactEmail').value.trim();
-            if (!email.includes("@")) {
-                alert("Enter a valid email address.");
-                return;
-            }
-
-            alert("Checking if user exists...");
-
-            try {
-                let usersRef = collection(db, "users");
-                let q = query(usersRef, where("email", "==", email));
-                let querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    alert("This email is not registered on PChat.");
-                    return;
-                }
-
-                alert("User found! Checking if contact already exists...");
-
-                let contactsRef = collection(db, "contacts");
-                let existingQuery = query(contactsRef, where("userEmail", "==", currentUser.email), where("contactEmail", "==", email));
-                let existingSnapshot = await getDocs(existingQuery);
-
-                if (!existingSnapshot.empty) {
-                    alert("This contact is already added.");
-                    return;
-                }
-
-                await addDoc(contactsRef, { userEmail: currentUser.email, contactEmail: email });
-
-                alert("Contact added successfully!");
-                loadContacts();
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        }
-
-        async function loadContacts() {
-            if (!currentUser) return;
-
-            alert("Loading contacts...");
-            let contactsRef = collection(db, "contacts");
-            let q = query(contactsRef, where("userEmail", "==", currentUser.email));
-            let querySnapshot = await getDocs(q);
-
-            let list = document.getElementById('contactList');
-            list.innerHTML = "";
-
-            querySnapshot.forEach(doc => {
-                let li = document.createElement('li');
-                let contactEmail = doc.data().contactEmail;
-                li.innerHTML = `${contactEmail} <button onclick="startChat('${contactEmail}')">Chat</button>`;
-                list.appendChild(li);
-            });
-        }
-
-        function startChat(email) {
-            localStorage.setItem("chatUser", email);
-            location.href = "chat.html";
-        }
-    </script>
 
 </body>
 </html>
